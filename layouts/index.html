@@ -1,0 +1,15 @@
+
+{{ define "main" }}
+  <div class="main" role="main">
+    <div class="toppage-header">
+        {{ with .Site.Params.topimage }}<img src="{{ . }}">{{ end }}
+    </div>
+    <ul class="section-list">
+      {{ range .Site.Sections }}
+        {{ if .Title }}
+          <li><a href="{{ .RelPermalink }}">{{ .Title }}</a> - {{ .Description }}
+        {{ end }}
+      {{ end }}
+    </ul>
+  </div>
+{{ end }}

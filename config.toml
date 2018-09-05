@@ -1,3 +1,93 @@
-baseURL = "http://example.org/"
-languageCode = "en-us"
-title = "My New Hugo Site"
+baseurl = "https://example.com"
+title = "genneko"
+#themesDir = "../../"
+theme = "whiteplain"
+languageCode = "en"
+# Disqus shortname
+#disqusShortname = ""
+# google analytics tracking id
+#googleAnalytics = ""
+pygmentsCodefences = true
+pygmentsUseClasses = true
+#pygmentsOptions = "linenos=table"
+# Copyright notice. This is displayer in the footer.
+copyright = "&copy; Copyright 2018 genneko"
+pluralizelisttitles = false
+
+[params]
+  # Date format
+  dateFormat = "2006-01-02"
+
+  topimage = "/images/forest.jpg"
+
+# This is displayer in About page.
+[params.author]
+  name = "genneko"
+
+  # Gravatar or Abatar image
+  #gravatar = "Gravatar email or MD5 Hash"
+  avatar = "/images/genneko.png"
+
+  twitter = "genneko217"
+  #facebook = "Facebook username"
+  #googleplus = "Googleplus username"
+  #instagram = "Instagram username"
+  #tumblr = "Tumblr username"
+  #flickr = "Flickr username"
+  #reddit = "Reddit username"
+  #linkedin = "Linkedin username"
+  #slideshare = "Slideshare username"
+  github = "genneko"
+  #gitlab = "Gitlab username"
+  #bitbucket = "Bitbucket username"
+  #stackoverflow = "Stackoverflow username"
+  #jsfiddle = "Jsfiddle username"
+  #codepen = "Codepen username"
+  #deviantart = "Deviantart username"
+  #behance = "Behance username"
+  #dribbble = "Dribbble username"
+  #wordpress = "Wordpress username"
+  #medium = "Medium username"
+  #foursquare = "Foursquare username"
+  #xing = "Xing username"
+  #quora = "Quora username"
+  #youtube = "Youtube username"
+  #vimeo = "Vimeo username"
+  #whatsapp = "Whatsapp username"
+  #skype = "Skype username"
+  #snapchat = "Snapchat username"
+  #pinterest = "Pinterest username"
+  #telegram = "Telegram username"
+  #vine = "Vine username"
+  #email = "Your email"
+
+[taxonomies]
+  tag = "tags"
+  series = "series"
+
+[[menu.main]]
+  name = "Playing with BSD"
+  weight = 1
+  identifier = "playing-with-bsd"
+  url = "/playing-with-bsd/"
+[[menu.main]]
+  name = "Tags"
+  weight = 2
+  identifier = "tags"
+  url = "/tags/"
+[[menu.main]]
+  name = "Archives"
+  weight = 3
+  identifier = "archives"
+  url = "/archives/"
+[[menu.main]]
+  name = "About"
+  weight = 4
+  identifier = "about"
+  url = "/about/"
+
+[[menu.footer]]
+  name = "About"
+  weight = 1
+  identifier = "about"
+  url = "/about/"

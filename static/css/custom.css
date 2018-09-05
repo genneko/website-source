@@ -1,0 +1,38 @@
+pre, code {
+	font-family: Consolas, courier, courier-new, monospace;
+	font-size: 10pt;
+}
+pre {
+	padding: 8px;
+}
+code {
+	padding: 2px 8px 2px 8px;
+}
+body {
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Segoe UI", sans-serif;
+  color: #444444;
+  overflow-y: scroll;
+  line-height: 1.2;
+}
+/* Toppage Header */
+.toppage-header {
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
+}
+.toppage-header img {
+  width: 900px;
+  max-width: 100%;
+}
+/* Site header */
+.site-navi {
+  -webkit-align-items: flex-end;
+  align-items: flex-end;
+}
+/* Section list */
+.section-list {
+  margin-top: 2rem;
+}
+.section-list li {
+  margin-top: 1rem;
+}

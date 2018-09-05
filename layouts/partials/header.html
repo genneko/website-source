@@ -1,0 +1,14 @@
+
+<header class="site-header">
+  <nav class="site-navi">
+    <img src="/images/genneko-icon.png" style="height: 2rem; margin: 0 1em 0 0">
+    <h1 class="site-title">
+      <a href="{{ "/" | relURL }}">{{ .Site.Title }}</a></h1>
+    <ul class="site-navi-items">
+      {{- range .Site.Menus.main }}
+      <li class="site-navi-item-{{ .Identifier }}"><a href="{{ .URL | safeURL }}" title="{{ .Name }}">{{ .Name }}</a></li>
+      {{- end }}
+    </ul>
+  </nav>
+</header>
+<hr class="site-header-bottom">
