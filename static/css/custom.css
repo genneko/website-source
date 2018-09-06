@@ -29,6 +29,10 @@ body {
   -webkit-align-items: flex-end;
   align-items: flex-end;
 }
+.site-icon {
+  height: 2rem;
+  margin: 0 1em 0 0;
+}
 /* Section list */
 .section-list {
   margin-top: 2rem;
