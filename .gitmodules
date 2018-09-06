@@ -1,3 +1,7 @@
 [submodule "themes/whiteplain"]
 	path = themes/whiteplain
 	url = git@github.com:genneko/whiteplain.git
+[submodule "public"]
+	path = public
+	url = git@github.com:genneko/genneko.github.io.git
+	branch = master
