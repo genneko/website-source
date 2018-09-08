@@ -8,6 +8,22 @@
       {{ range .Site.Sections }}
         {{ if .Title }}
           <li><a href="{{ .RelPermalink }}">{{ .Title }}</a> - {{ .Description }}
+            {{ $maxarticle := default 2 .Site.Params.toparticlemax }}
+            {{ $numarticle := len .Pages }}
+            {{ $morearticle := sub $numarticle $maxarticle }}
+
+            <ul class="section-article-list">
+              {{ range first $maxarticle .Pages }}
+                <li><time>{{ .Date.Format (default "January 2, 2006" $.Site.Params.dateFormat) }}</time> - <a href="{{ .Permalink | relURL }}">{{ .Title }}</a>
+              {{ end }}
+
+              {{ if ge $morearticle 1 }}
+                <li>{{ $morearticle }} more article
+                {{- if ge $morearticle 2 }}s{{- end }}
+                ...
+              {{ end }}
+            </ul>
+
         {{ end }}
       {{ end }}
     </ul>

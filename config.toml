@@ -21,6 +21,7 @@ canonifyurls = true
 
   topimage = "/images/forest.jpg"
   headericon = "/images/genneko-icon.png"
+  #toparticlemax = 3
 
 # This is displayer in About page.
 [params.author]

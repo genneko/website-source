@@ -40,3 +40,6 @@ body {
 .section-list li {
   margin-top: 1rem;
 }
+.section-article-list li {
+  margin-top: 1ex;
+}
