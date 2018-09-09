@@ -5,7 +5,7 @@ draft: false
 tags: [ "storage", "zfs", "geom", "geli", "freebsd" ]
 toc: true
 ---
-Recently, I wanted an encrypted working directory on a running FreeBSD system. The system was running on a plain (unencrypted) ZFS pool and there's no plan to add disks to it. I needed the working directory only temporarily. So what could I do?
+Recently, I wanted an encrypted working directory on a running FreeBSD system. The system was running on a plain (unencrypted) ZFS pool and there's no plan to add disks to it. I needed the working directory only temporarily.
 
 I came up with the following options.
 
