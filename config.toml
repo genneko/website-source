@@ -6,7 +6,7 @@ languageCode = "en"
 # Disqus shortname
 #disqusShortname = ""
 # google analytics tracking id
-#googleAnalytics = ""
+googleAnalytics = "UA-125705988-1"
 pygmentsCodefences = true
 pygmentsUseClasses = true
 #pygmentsOptions = "linenos=table"
