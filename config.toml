@@ -15,6 +15,13 @@ copyright = "&copy; Copyright 2018 genneko"
 pluralizelisttitles = false
 canonifyurls = true
 
+[privacy]
+  [privacy.googleAnalytics]
+    anonymizeIP = true
+    disable = true
+    respectDoNotTrack = true
+    useSessionStorage = true
+
 [params]
   # Date format
   dateFormat = "2006-01-02"
