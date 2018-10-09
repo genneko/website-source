@@ -9,7 +9,7 @@ I had been playing with IPv6 on various systems in early 2000s. They were mostly
 
 After a decade and a half, I decided to reconnect my home network to the IPv6 Internet.
 
-Unfortunately, native IPv6 service is still unavailable for me. So I chose Hurricane Electric(HE)'s TunnelBroker service, which I was using 15 years ago.
+Unfortunately, native IPv6 service is still unavailable for me. So I chose Hurricane Electric(HE)'s [TunnelBroker](https://tunnelbroker.net/) service, which I was using 15 years ago.
 
 Another option is to build a tunnel to the VPS which is assigned a single IPv6 address and perform NAT66 there. Although IPv6 NAT sounds somewhat evil, it's interesting enough so I might also give it a try in future and hopefully write up another post.
 
