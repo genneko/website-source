@@ -416,4 +416,9 @@ https://clinta.github.io/freebsd-jails-the-hard-way/
 * Devin Teske - Jail Networking, MeetBSD 2016  
 https://www.youtube.com/watch?v=aoW7pWuhT_A
 
+* Daemon News: All About Netgraph  
+https://people.freebsd.org/~julian/netgraph.html
+
+* NetBSD: Introduction to NETGRAPH on FreeBSD Systems (PDF)  
+http://www.netbsd.org/gallery/presentations/ast/2012_AsiaBSDCon/Tutorial_NETGRAPH.pdf
 

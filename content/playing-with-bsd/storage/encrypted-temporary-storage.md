@@ -119,3 +119,21 @@ This creates the decrypted device node with .eli extension (``/dev/md0.eli``).
 	```
 	$ sudo mdconfig -d -u md0
 	```
+
+## References
+* FreeBSD Handbook: Memory Disks  
+https://www.freebsd.org/doc/handbook/disks-virtual.html
+
+* FreeBSD Handbook: Encrypting Disk Partitions  
+https://www.freebsd.org/doc/handbook/disks-encrypting.html
+
+* FreeBSD Handbook: zfs Administration  
+https://www.freebsd.org/doc/handbook/zfs-zfs.html
+
+* PEFS - Private Encrypted File System  
+http://pefs.io/
+
+* BSD Now: Filesystem-based encryption with PEFS  
+https://www.bsdnow.tv/tutorials/pefs
+
+

@@ -109,3 +109,8 @@ strongswan_enable="YES"
 ```
 ifconfig ipsec0 inet tunnel 10.0.0.1 10.0.0.2
 ```
+
+## References
+* strongSwan: Issue #2214 IPsec VTI support for FreeBSD  
+https://wiki.strongswan.org/issues/2214
+
