@@ -388,7 +388,7 @@ sudo shutdown -r now
 ```
 
 ### Preparing Helper Script
-I made a small helper script called vnet, which is based on jng in the FreeBSD source tree.
+I made a quick-and-dirty modification to the jng script in the FreeBSD source tree and named it vnet. This small script is used to setup netgraph-based virtual switch/interfaces for the host and jails.
 ```
 mkdir ~/src
 cd ~/src
