@@ -135,6 +135,10 @@ done
 ## Configuring Jails
 
 ### System Startup Configuration
+Do not forget to create a cloned loopback interface "lo1" on which jail's addresses are configured.
+
+PF is used for NAT and port forwarding.
+
 [/etc/rc.conf]
 ```
 cloned_interfaces="lo1"
@@ -204,23 +208,32 @@ h4 {
 ```
 
 ### NAT Configuration
+PF configuration should be written in the strict order of categories.
+
+For IPv6 NAT, I explicitly specify a external (global) address instead of the interface name because an IPv6 interface usually has multiple addresses and it seems the interface name could be resolved to its link-local address.
+
 [/etc/pf.conf]
 ```
-# MACRO DEFINITIONS
+# MACROS/TABLES
 XIF = "em0"
 JAILNET_V4 = "127.1.1.0/24"
 JAILNET_V6 = "fd00:1:1:1::0/64"
 EXT_V6ADDR = "2001:db8::1"
 
-# SET PARAMETERS (skip, scrub etc.)
+# OPTIONS (set skip, etc.)
+# NORMALIZATION (scrub)
+# QUEUEING
 
-# NAT
+# TRANSLATION
+## NAT
 nat on $XIF inet from $JAILNET_V4 to any -> ($XIF)
 nat on $XIF inet6 from $JAILNET_V6 to any -> $EXT_V6ADDR
 
-# Redirect
+## REDIRECT (Port Forwarding)
 rdr pass log on $XIF inet proto tcp to ($XIF) port 8080 -> 127.1.1.4
 rdr pass log on $XIF inet6 proto tcp to $EXT_V6ADDR port 8080 -> fd00:1:1:1::4
+
+# FILTERING (Pass/Block)
 ```
 
 ### Hosts Table
@@ -263,7 +276,9 @@ List running jails.
 ```
 jls
 jls -v
+jls -s
 ```
+__NOTE:__ At first I was confused by `ip4=disable` output of `jls -s`. But later I looked at /usr/src/usr.sbin/jls/jls.c and learned that it's correct because ip4's value is 'disable' unless explicitly set otherwise. It's just regarded as 'new' when ip4.addr is set.
 
 Stop specific jail(s).
 ```
@@ -427,3 +442,7 @@ https://mwl.io/nonfiction/os#fmzfs
 
 * FreeBSD Mastery: Advanced ZFS by Michael W. Lucas and Allan Jude  
 https://mwl.io/nonfiction/os#fmaz
+
+* FreeBSD Mastery: Specialty Filesystems by Michael W. Lucas  
+https://mwl.io/nonfiction/os#fmsf
+
