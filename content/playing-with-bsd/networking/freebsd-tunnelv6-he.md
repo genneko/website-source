@@ -152,3 +152,19 @@ Here I configure so that only a single host 'pc1' can get a statically configure
     $ sudo service isc-dhcpd6 start
     ```
 
+## References
+* Hurricane Electric: IPv6 Tunnel Broker  
+https://tunnelbroker.net/
+
+* Hurricane Electric's IPv6 Tunnel Broker Forums  
+https://forums.he.net/
+
+* FreeBSD Manual Pages: rtadvd.conf(5)  
+https://www.freebsd.org/cgi/man.cgi?rtadvd.conf(5)
+
+* FreeBSD Manual Pages: pf.conf(5)  
+https://www.freebsd.org/cgi/man.cgi?pf.conf(5)
+
+* The Book of PF by Peter N. M. Hansteen  
+https://nostarch.com/pf3
+

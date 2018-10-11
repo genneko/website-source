@@ -132,3 +132,20 @@ After several rehearsals on a VM, I have finally achieved that goal with the fol
 	```
 
 14. When resilvering is done, you've got a brand new ZFS mirror pool!
+
+## References
+
+* FreeBSD Handbook: GEOM: Modular Disk Transformation Framework / RAID1 - Mirroring  
+https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/geom-mirror.html
+
+* FreeBSD Handbook: The Z File System (ZFS)  
+https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/zfs.html
+
+* FreeBSD Mastery: Storage Essentials by Michael W. Lucas  
+https://mwl.io/nonfiction/os#fmse
+
+* FreeBSD Mastery: ZFS by Michael W. Lucas and Allan Jude  
+https://mwl.io/nonfiction/os#fmzfs
+
+* FreeBSD Mastery: Advanced ZFS by Michael W. Lucas and Allan Jude  
+https://mwl.io/nonfiction/os#fmaz

@@ -136,4 +136,9 @@ http://pefs.io/
 * BSD Now: Filesystem-based encryption with PEFS  
 https://www.bsdnow.tv/tutorials/pefs
 
+* FreeBSD Mastery: Storage Essentials by Michael W. Lucas  
+https://mwl.io/nonfiction/os#fmse
+
+* FreeBSD Mastery: Specialty Filesystems by Michael W. Lucas  
+https://mwl.io/nonfiction/os#fmsf
 

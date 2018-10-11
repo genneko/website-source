@@ -111,6 +111,17 @@ ifconfig ipsec0 inet tunnel 10.0.0.1 10.0.0.2
 ```
 
 ## References
+* strongSwan: Route-based VPNs  
+https://wiki.strongswan.org/projects/strongswan/wiki/RouteBasedVPN
+
 * strongSwan: Issue #2214 IPsec VTI support for FreeBSD  
 https://wiki.strongswan.org/issues/2214
 
+* FreeBSD Phabricator: P112 Route based IPsec  
+https://reviews.freebsd.org/P112
+
+* FreeBSD Manual Pages: ipsec.conf(5)  
+https://www.freebsd.org/cgi/man.cgi?query=ipsec.conf(5)
+
+* FreeBSD Manual Pages: strongswan.conf(5)  
+https://www.freebsd.org/cgi/man.cgi?query=strongswan.conf(5)
