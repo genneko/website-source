@@ -299,7 +299,7 @@ sudp pkg -j h1 install git-lite vim-console
 
 Update package repositories on multiple jails using shell's for loop.
 ```
-for host in $(sysrc -n jail_list); do
+for host in $(jls name); do
   sudo pkg -j $host update
 done
 ```
