@@ -397,11 +397,95 @@ sudo ln -s ~/src/jails/vnet /usr/sbin/
 ```
 
 ### /etc/jail.conf for VNET Jails
-For each VNET jails, add the following content to /etc/jail.conf.  
-$net is the name of a host-only virtual ethernet interface (ng_eiface) on the host and could be anything you like.  
-$gwv4 is the IP address of the interface while $ipv4 is the IP address of the jail (another ng_eiface).  
+Depending on the network configuration, slightly different configuration should be added to /etc/jail.conf for each VNET jail.
+
+#### Bridged Configuration
+
+<pre style="line-height: 10pt"><code style="font-size: 9pt">                      |
+                      |
+                 +----o----+
+                 | gateway |
+                 +----o----+
+                      | $gwv4/$plen
+                      |
++--------+------------+------------------+
+         |
+     em0 | (ng_ether)
+  (=$net)|
++--------|-------------------------------+
+|        |                               |
+|        | lower +-------------+         |
+|        +-------+    em0br    |         |
+|        +-------+ (ng_bridge) |         |
+|        | upper +---------+---+         |
+|        |                 |             |
+|        |          em0_b1 | $ipv4/$plen |
+|    em0 |     (ng_eiface) |             |
+|    +---o---+         +---o---+         |
+|    |  Host |         |Jail b1|         |
+|    +-------+         +-------+         |
++----------------------------------------+
+</code></pre>
+
+For a bridge configuration, $net is the name of a physical ethernet interface (ng_ether) on the host.  
+$gwv4 is the IP address of a default gateway for the jail and the host while $ipv4 is the IP address of the jail's virtual interface (ng_eiface).  
+$plen is a subnet mask length for the bridged network.  
+The jail's virtual interface and the host's physical interface are connected by a ng_bridge named '${net}br'.  
+In this configuration, the jail uses the same router (gateway) as the host to go out.
+
+```
+b1 {
+        $net = "em0";
+        $gwv4 = "192.168.1.1";
+        $ipv4 = "192.168.1.11";
+        $plen = 24;
+
+        vnet;
+        vnet.interface = "${net}_$name";
+        exec.prestart += "vnet add $net ${net}_$name";
+        exec.start    += "ifconfig ${net}_$name $ipv4/$plen";
+        exec.start    += "route add default $gwv4";
+        exec.poststop += "vnet delete $net ${net}_$name";
+}
+```
+
+#### Routed Configuration
+
+<pre style="line-height: 10pt"><code style="font-size: 9pt">                      |
+                      |
+                 +----o----+
+                 | gateway |
+                 +----o----+
+                      |
+                      |
++--------+------------+------------------+
+         |
+Physical |
+     I/F |
++--------|-------------------------------+
+|    +---o---+                           |
+|    |  Host | (Internal gateway)        |
+|    +---o---+                           |
+|    vi0 | $gwv4/$plen                   |
+|(ng_eiface)                             |
+|        |       +-------------+         |
+|        +-------+    vi0br    |         |
+|                | (ng_bridge) |         |
+|                +---------+---+         |
+|                          |             |
+|                   vi0_v1 | $ipv4/$plen |
+|              (ng_eiface) |             |
+|                      +---o---+         |
+|                      |Jail v1|         |
+|                      +-------+         |
++----------------------------------------+
+</code></pre>
+
+For a routed configuration, $net is the name of an internal virtual ethernet interface (ng_eiface) on the host and could be any name you like. This interface is created by the vnet script if it doesn't exist.  
+$gwv4 is the IP address of this internal interface while $ipv4 is the IP address of the jail's virtual interface (another ng_eiface).  
 $plen is a subnet mask length for the virtual network.  
-The jail and the host's virtual interface are connected by a ng_bridge.
+The jail and the host's virtual interface are connected by a ng_bridge named '${net}br'.  
+In this configuration, the jail use the host as a gateway to the outside world.
 ```
 v1 {
         $net = "vi0";
@@ -416,6 +500,21 @@ v1 {
         exec.start += "route add default $gwv4";
         exec.poststop += "vnet delete $net ${net}_$name";
 }
+```
+
+### Enabling Packet Forwarding on the Host
+For a routed configuration, IP packet forwarding should be enabled to allow the jail to go out to the internet.  
+IPv4 packet forwarding can be controlled by sysctl variables ``net.inet.ip.forwarding``.  
+It can be configured in /etc/sysctl.conf but the following line in /etc/rc.conf looks nicer to me.
+
+[/etc/rc.conf]
+```
+gateway_enable="YES"
+```
+
+For IPv6, use the following configuration.
+```
+ipv6_gateway_enable="YES"
 ```
 
 ## References
