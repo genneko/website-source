@@ -22,6 +22,15 @@ canonifyurls = true
     respectDoNotTrack = true
     useSessionStorage = true
 
+DefaultContentLanguage = "en"
+
+[languages]
+[languages.en]
+weight = 1
+
+[languages.ja]
+weight = 2
+
 [params]
   # Date format
   dateFormat = "2006-01-02"
