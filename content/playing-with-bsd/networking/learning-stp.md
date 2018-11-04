@@ -9,7 +9,9 @@ Spanning Tree Protocol is a standard protocol for network bridges (layer-two swi
 
 Several variants have been developed since its birth, in which the most common standard is Rapid Spanning Tree Protocol (RSTP). Many managed switches implement the protocol and often enable it by default.
 
-Although it's quite common in the networking world where I'm living in its perimeter, it's been something vague and unfamiliar to me for a long time. Maybe it's because I came from the application layer and gradually went down to lower layers. I can clearly recall the excitement when I sent an email by directly talking to a SMTP server using telnet client for the first time. After all, I'm more interested in the higher layers and I haven't given much attention to the layer one and two.
+Although it's quite common in the networking world where I'm living in its perimeter, it's been something vague and unfamiliar to me for a long time. Maybe it's because I came from the application layer and gradually went down to lower layers [^0]. After all, I'm more interested in the higher layers and I haven't given much attention to the layer one and two.
+
+[^0]: I can clearly recall the excitement when I sent an email by directly talking to a SMTP server using telnet client for the first time.
 
 But recently I noticed that FreeBSD's if_bridge supports RSTP when I was playing with jails and reading related documents. I instantly felt that this is a good opportunity to learn the protocol.
 
@@ -215,17 +217,17 @@ With the help of additional scripts written in perl, bridge.sh can also summariz
 (I must confess again. Perl is my favorite scripting language.)
 ```
 $ ./bridge.sh show
-bridge0 32768.02:00:90:00:0b:0b desig root 32768.02:00:90:00:07:0b cost 2000
-  epair0a  proto rstp  id 128.6   cost   2000:       root / forwarding
-  epair2b  proto rstp  id 128.11  cost   2000: designated / discarding
+bridge0 32768.02:00:80:00:0c:0b desig root 32768.02:00:80:00:08:0b cost 2000
+  epair0a  proto rstp  id 128.7   cost   2000:       root / forwarding
+  epair2b  proto rstp  id 128.12  cost   2000:  alternate / discarding
 
-bridge1 32768.02:00:90:00:07:0b [root]
-  epair0b  proto rstp  id 128.7   cost   2000: designated / forwarding
-  epair1a  proto rstp  id 128.8   cost   2000: designated / forwarding
+bridge1 32768.02:00:80:00:08:0b [root]
+  epair0b  proto rstp  id 128.8   cost   2000: designated / forwarding
+  epair1a  proto rstp  id 128.9   cost   2000: designated / forwarding
 
-bridge2 32768.02:00:90:00:09:0b desig root 32768.02:00:90:00:07:0b cost 2000
-  epair1b  proto rstp  id 128.9   cost   2000:       root / forwarding
-  epair2a  proto rstp  id 128.10  cost   2000: designated / discarding
+bridge2 32768.02:00:80:00:0a:0b desig root 32768.02:00:80:00:08:0b cost 2000
+  epair1b  proto rstp  id 128.10  cost   2000:       root / forwarding
+  epair2a  proto rstp  id 128.11  cost   2000: designated / forwarding
 ```
 
 I got almost satisfied with those scripts. But I went on one step further.
@@ -255,7 +257,7 @@ As the root bridge operates in the core of a network, it's so important to confi
 
 In the Spanning Tree network, bridges exchange information and automatically elect a bridge with the lowest bridge id value as a root bridge in the network.
 
-A bridge id is a 8 octets (= bytes) value and is made up of two components - a bridge priority and a bridge MAC address. In the previous example of three bridges, strings like '32768.02:00:90:00:0b:0b' are bridge ids. The first part (e.g. '32768') is the bridge priority and the second part (e.g. '02:00:90:00:0b:0b') is the bridge's MAC address.
+A bridge id is a 8 octets (= bytes) value and is made up of two components - a bridge priority and a bridge MAC address. In the previous example of three bridges, strings like '32768.02:00:80:00:0c:0b' are bridge ids. The first part (e.g. '32768') is the bridge priority and the second part (e.g. '02:00:80:00:0c:0b') is the bridge MAC address.
 
 <style>
 .bl { color: blue; }
@@ -263,36 +265,36 @@ A bridge id is a 8 octets (= bytes) value and is made up of two components - a b
 </style>
 
 <pre><code>$ ./bridge.sh show
-bridge0 <b class="gr">32768</b>.<b class="bl">02:00:90:00:0b:0b</b> desig root 32768.02:00:90:00:07:0b cost 2000
-  epair0a  proto rstp  id 128.6   cost   2000:       root / forwarding
-  epair2b  proto rstp  id 128.11  cost   2000: designated / discarding
+bridge0 <b class="gr">32768</b>.<b class="bl">02:00:80:00:0c:0b</b> desig root 32768.02:00:80:00:08:0b cost 2000
+  epair0a  proto rstp  id 128.7   cost   2000:       root / forwarding
+  epair2b  proto rstp  id 128.12  cost   2000:  alternate / discarding
 
-bridge1 <b class="gr">32768</b>.<b class="bl">02:00:90:00:07:0b</b> [root]
-  epair0b  proto rstp  id 128.7   cost   2000: designated / forwarding
-  epair1a  proto rstp  id 128.8   cost   2000: designated / forwarding
+bridge1 <b class="gr">32768</b>.<b class="bl">02:00:80:00:08:0b</b> [root]
+  epair0b  proto rstp  id 128.8   cost   2000: designated / forwarding
+  epair1a  proto rstp  id 128.9   cost   2000: designated / forwarding
 
-bridge2 <b class="gr">32768</b>.<b class="bl">02:00:90:00:09:0b</b> desig root 32768.02:00:90:00:07:0b cost 2000
-  epair1b  proto rstp  id 128.9   cost   2000:       root / forwarding
-  epair2a  proto rstp  id 128.10  cost   2000: designated / discarding
+bridge2 <b class="gr">32768</b>.<b class="bl">02:00:80:00:0a:0b</b> desig root 32768.02:00:80:00:08:0b cost 2000
+  epair1b  proto rstp  id 128.10  cost   2000:       root / forwarding
+  epair2a  proto rstp  id 128.11  cost   2000: designated / forwarding
 </code></pre>
 
-While MAC address is normally unique and not user-configurable, bridge priority is meant to be configured by administrator. But recommended default of the bridge priority is 32768 and FreeBSD's if_bridge is no exception.
+While MAC address is normally unique and not user-configurable, bridge priority is meant to be configured by administrator.
 
-So without explicit configuration, bridge priorities could be the same across all bridges in a network. In that case, a bridge with the smallest MAC address is elected as a root bridge. This is effectively a random selection process.
+However, recommended default of the bridge priority is 32768 and FreeBSD's if_bridge is no exception. So without explicit configuration, bridge priorities could be the same across all bridges in a network. In that case, a bridge with the smallest MAC address is elected as a root bridge. This is effectively a random selection process.
 
 To avoid this, it is said that network administrators should set bridge priority of the candidate root bridge lower than other ordinary bridges.
 
 Because I didn't do that in the previous example, all bridges had the same priority value 32768 and bridge1, which happened to have the lowest MAC address among three became the root bridge.
 
-Note that MAC addresses are drastically shortened to 2-digit number (it's a hexadecimal actually) on the visualization app for brevity. They only represent relative magnitude among the bridges. Actual MAC address can be seen in a popup which appears by putting your mouse cursor over a bridge.
-
 ![3-bridge topology. bridge1 became a root](/images/learning-stp/rstp-3b-r1.jpg)
 
-Now let's try to make bridge0 a root bridge by configuring its bridge priority to a smaller value. Bridge priority can be changed with omnipotent ifconfig command. Here I set bridge0's priority to 4096 [^3].
+Note that MAC addresses are shortened to 2-digit hexadecimal numbers on the visualization app for brevity. They only represent relative magnitude among the bridges. Actual MAC address can be seen in a popup which appears by putting mouse cursor over a bridge.
+
+Now let's try to make bridge0 a root bridge by configuring its bridge priority to a smaller value. Bridge priority can be changed with omnipotent ifconfig command. Here I set bridge0's priority to the smallest possible value, 0 [^3].
 
 [^3]: Actually a bridge priority can be only a multiple of 4096 between 0 and 61440.
 ```
-$ sudo ifconfig bridge0 priority 4096
+$ sudo ifconfig bridge0 priority 0
 ```
 
 Change of bridge priority caused another election process and bridge0 became a new root bridge.
@@ -300,31 +302,130 @@ Change of bridge priority caused another election process and bridge0 became a n
 ![3-bridge topology. bridge0 became a root](/images/learning-stp/rstp-3b-r0.jpg)
 
 <pre><code>$ ./bridge.sh show
-bridge0 <b class="gr">4096</b>.<b class="bl">02:00:90:00:0b:0b</b> [root]
-  epair0a  proto rstp  id 128.6   cost   2000: designated / forwarding
-  epair2b  proto rstp  id 128.11  cost   2000: designated / forwarding
+bridge0 <b class="gr">0</b>.<b class="bl">02:00:80:00:0c:0b</b> [root]
+  epair0a  proto rstp  id 128.7   cost   2000: designated / forwarding
+  epair2b  proto rstp  id 128.12  cost   2000: designated / forwarding
 
-bridge1 <b class="gr">32768</b>.<b class="bl">02:00:90:00:07:0b</b> desig root 4096.02:00:90:00:0b:0b cost 2000
-  epair0b  proto rstp  id 128.7   cost   2000:       root / forwarding
-  epair1a  proto rstp  id 128.8   cost   2000: designated / forwarding
+bridge1 <b class="gr">32768</b>.<b class="bl">02:00:80:00:08:0b</b> desig root 0.02:00:80:00:0c:0b cost 2000
+  epair0b  proto rstp  id 128.8   cost   2000:       root / forwarding
+  epair1a  proto rstp  id 128.9   cost   2000: designated / forwarding
 
-bridge2 <b class="gr">32768</b>.<b class="bl">02:00:90:00:09:0b</b> desig root 4096.02:00:90:00:0b:0b cost 2000
-  epair1b  proto rstp  id 128.9   cost   2000:  alternate / discarding
-  epair2a  proto rstp  id 128.10  cost   2000:       root / forwarding
+bridge2 <b class="gr">32768</b>.<b class="bl">02:00:80:00:0a:0b</b> desig root 0.02:00:80:00:0c:0b cost 2000
+  epair1b  proto rstp  id 128.10  cost   2000:  alternate / discarding
+  epair2a  proto rstp  id 128.11  cost   2000:       root / forwarding
 </code></pre>
 
-It must be undesirable to change priority in production networks but it's okay because this is just an experiment. But if you want to configure a specific bridge to be a root bridge when creating a topology, you can use the -R flag of 'bridge.sh' script.
+It must be undesirable to change bridge priorities carelessly in a production network but it's okay in this experimental network. However, if you want to configure a specific bridge to be a root bridge when creating a topology, you can use bridge.sh script's -R (root) flag.
 
-For example, you can generate the same 3-bridge topology with the first bridge (e.g. bridge0) being a root bridge by running the following command. ``-R 1`` specifies that the first bridge to be a root bridge. The command sets its priority to 4096 while leaving other bridge's priority default 32768.
+For example, you can generate the same 3-bridge topology with the first bridge (e.g. bridge0) being a root bridge by running the following command. ``-R 1`` specifies that the first bridge to be a root bridge. The command sets its priority to 0 while leaving other bridge's priorities at default value of 32768. Without -R flag, all bridges will have default priority values.
 ```
 $ sudo ./bridge.sh ring -R 1 3
 ```
 
-### Determining a Root Port on Each Non-Root Bridge
+### Root Ports
+For each non-root bridge, a single root port is selected based on its distance (cost) to the root bridge. Basically, a port with the least cost becomes the root port on a bridge.
 
-### Determining Other Port Roles
+To calculate the distances, every RSTP-enabled port has a property called port pathcost. By default, it is automatically configured according to its link speed.
 
-### Reacting to Topology Changes
+In the previous example, all ports (epairs) have a cost of 2000, which is the default value for 10Gbps links! Running ifconfig on one of the epair interfaces let me confirm that they were configured as 10Gbase-T interfaces.
+```
+$ ifconfig epair0a
+epair0a: flags=8943<UP,BROADCAST,RUNNING,PROMISC,SIMPLEX,MULTICAST> metric 0 mtu 1500
+        options=8<VLAN_MTU>
+        ether 02:ff:00:00:07:0a
+        hwaddr 02:ff:00:00:07:0a
+        inet6 fe80::ff:ff:fe00:70a%epair0a prefixlen 64 scopeid 0x7
+        nd6 options=21<PERFORMNUD,AUTO_LINKLOCAL>
+        media: Ethernet 10Gbase-T (10Gbase-T <full-duplex>)
+        status: active
+        groups: epair
+```
+
+With this (all ports have pathcost 2000) in mind, let's look at each port's distance to the root bridge (it is called the port's root pathcost).
+
+On bridge1, epair0b's root pathcost is 2000 because bridge0 considers that the cost of the link attached to epair0b interface is 2000 and it is the only link required to reach the root bridge (bridge0). On the same bridge, epair1a's root pathcost is 4000 because there are two links (epair1 and epair2) between the interface and the root bridge thus the total root pathcost of epair1a is equal to 2000 + 2000. So, epair0b becomes the root port on bridge1 because it has the smallest root pathcost on the bridge.
+
+On bridge2, epair2a is selected as the root port in the same way.
+
+![Root Ports](/images/learning-stp/rstp-3b-r0.jpg)
+
+On each non-root bridge, a port closest to the root bridge becomes the root port on the bridge. Very simple.  
+But what if a bridge has more than one ports with the same root pathcost?
+
+There could be two cases for this. The first one is the case where a single bridge is connected to two or more other bridges and those bridges have the same root pathcost.
+
+Another case is that a single bridge has two or more links with the same pathcost to another bridge.
+
+There's no such situations in the previous example. So I tried to create them.
+
+The first case can be generated by adding a new bridge and connect it to both bridge1 and bridge2. To achieve this, I ran the follwoing commands.
+```
+sudo ./bridge.sh ring 1
+sudo ./bridge.sh connect bridge1 bridge3
+sudo ./bridge.sh connect bridge2 bridge3
+```
+
+Those commands added bridge3 and linked it to bridge2 and bridge3 with newly created epair3 and epair4 respectively. Here bridge3 has two ports, epair3b and epair4b, which have the same root pathcost of 4000.
+
+If a bridge has multiple ports with the least root pathcost, it choose a port connected to a neighboring bridge with the lowest bridge id as the root port. In this case, bridge3's neighbors are bridge1 (Shortend id: 32768.00)  and bridge2 (Shortend id: 32768.01) and bridge1 has the lower bridge id. bridge3 chose epair3b as the root port because it is connected to the lowest id neighbor, bridge1.
+
+![Root Port Selection with multiple equal-cost links 1](/images/learning-stp/rstp-4b-r0.jpg)
+
+The second case can be observed by adding a parallel link between bridge0 and bridge1. I ran the following command.
+```
+sudo ./bridge.sh connect bridge0 bridge1
+```
+
+This command added a new link epair5 between bridge0 and bridge1. Now bridge1 has two ports with the least root pathcost, epair0b and epair5b. This time, both ports also has the same neighbor, bridge0.
+
+If a bridge has multiple ports with the least root pathcost and the same neighbor, it choose a port whose neighbor port has the lowest port id. A port id is comprised of a port priority and a port index (number). As with the bridge id, port priority can be user-configurable while port index is determined by the system. Recommended default value of the port priority is 128. On the visualization app, port ids are shown like 128.7 where 128 is a priority and 7 is a port index.
+
+In this example, epair0b's neighbor epair0a's port id is 128.7 and epair5b's neighbor epair5a's port id is 128.12. Therefore, bridge1 continued to use epair0b as the root bridge even after epair5a was added as a parallel link to bridge0.
+
+![Root Port Selection with multiple equal-cost links 2](/images/learning-stp/rstp-4b-r0a.jpg)
+
+If you want bridge1 to use epair5b as its root port, you can set its neighbor port's priority to lower value. I tried this by running the following command [^4].
+[^4]: A port priority can be only a multiple of 16 between 0 and 240.
+```
+sudo ifconfig bridge0 ifpriority epair5a 64
+```
+
+Now epair5b's neighbor epair5a's port id was changed to 64.12 while epair0b's neighbor epair0a's port id is unchanged at 128.7. So bridge1 changes its root port from epair0b to epair5b.
+
+![Root Port Selection with multiple equal-cost links 3](/images/learning-stp/rstp-4b-r0b.jpg)
+
+### Designated and Alternate Ports
+After selecting root ports, each bridge selects designated ports out of the remaining ports. I think a designated port is somewhat like a gateway in IP terminology. That is, a designated port is a port on a link through which another port on the link can reach the root bridge with the minimum root pathcost. I was confused with the distinction between selection processes of root port and designated port but in summary:
+
+* Root port is selected according to the distance FROM the port.
+* Designated port is selected according to the distance THROUGH the port, the bridge it belongs to and its root port.
+
+On each link, a port on a bridge whose root port has the lowest root pathcost becomes the designated port on that link. Then remaining ports which aren't selected as root or designated port become the alternate port and block traffic to prevent loop.
+
+Let's look at an earlier example again. 
+
+![Designated and Alternate Ports](/images/learning-stp/rstp-3b-r0.jpg)
+
+All ports on the root bridge (epair0a and epair2b) become designated ports because those ports are apparently closest exits to the root bridge on their links (epair0 and epair2).
+
+On the link between bridge1 and bridge2 (epair1), epair1a on bridge1 and epair1b on bridge2 have the same root pathcost of 2000. In this case, a port belonging to the bridge with the lowest bridge id becomes the designated port on the link.
+
+Here bridge1's (shortened) id is 32768.00 while bridge2's is 32768.01, thus on epair1 link epair1a on bridge1 became the designated port and epair1b on bridge2 became the alternate port.
+
+### Topology Changes
+Next I wanted to see how RSTP reacts to topology changes.
+
+For this, I wiped the previous topology and created 4-bridge full-mesh topology with the following commands.
+```
+$ sudo ./bridge.sh destroy-all
+$ sudo ./bridge.sh mesh -R 1 4
+```
+
+![4 Bridge Mesh Topology 1](/images/learning-stp/rstp-4b-mesh-01.jpg)
+
+Here bridge0 became the root bridge. Other bridges selected their ports directly connected to the root bridge (epair0b on bridge1, epair1b on bridge2 and epair2b on bridge3) as the root ports.
+
+On each of the other links (epair3, epair4 and epair5), ports on both ends have the same pathcosts through its bridge's root port. So on each link, a port on the lowest id bridge became the designated port and another port became the alternate port.
 
 ## Quick Start
 1. Install the prerequisites.
