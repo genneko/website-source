@@ -9,22 +9,22 @@ Spanning Tree Protocol is a standard protocol for network bridges (layer-two swi
 
 Several variants have been developed since its birth, in which the most common standard is Rapid Spanning Tree Protocol (RSTP). Many managed switches implement the protocol and often enable it by default.
 
-Although it's quite common in the networking world where I'm living in its perimeter, it's been something vague and unfamiliar to me for a long time. Maybe it's because I came from the application layer and gradually went down to lower layers [^0]. After all, I'm more interested in the higher layers and I haven't given much attention to the layer one and two.
+Although it's quite common in the networking world where I'm living in its perimeter, it's been something vague and unfamiliar to me for a long time. Maybe it's because I came from the userland that is above the application layer and gradually went down to lower layers [^0]. After all, I'm more interested in the higher layers and I haven't given much attention to the layer one and two.
 
 [^0]: I can clearly recall the excitement when I sent an email by directly talking to a SMTP server using telnet client for the first time.
 
-But recently I noticed that FreeBSD's if_bridge supports RSTP when I was playing with jails and reading related documents. I instantly felt that this is a good opportunity to learn the protocol.
+But recently I noticed that FreeBSD's if_bridge supports RSTP when I was playing with jails and reading related documents. I instantly felt that this is a good opportunity to learn a litle more about the protocol.
 
-I know there are things called network simulators and they are widely used for education. Using some of them would save me some time. But as a UNIX hobbyist I want to do it on my own, even if I re-invent the tiny wheel.
+I do know that there are things called network simulators and they are widely used for education. Using some of them would save me some time. But as a UNIX user I want to do it on my own, even if I re-invent the tiny wheel.
 
-This is definitely not a practical usage of FreeBSD [^1] but it's gonna be fun. So I am going to abuse FreeBSD bridges to see how RSTP works!
+This is definitely not a practical usage of FreeBSD [^1] but it's gonna be fun. So I am going to misuse (or abuse) FreeBSD bridges to see how RSTP works!
 
 [^1]: It's also not specific to FreeBSD. The same experiment must be possible with any other operating system which supports STP bridges. I just used my favorite OS.
 
 Please note:
 
-* This article just describes my experience and understadings. It's not meant to be an accurate explanation of the Spanning Tree Protocol.
-* In the following text, I used the words Spanning Tree, Spanning Tree Protocol and STP for Rapid Spanning Tree Protocol (RSTP).
+* This article just describes my experience and understadings. It's never intended to be an accurate and/or concise explanation of Spanning Tree Protocol.
+* In the following text, I used the words Spanning Tree, Spanning Tree Protocol and STP mostly to refer to Rapid Spanning Tree Protocol (RSTP).
 
 ## Preparation
 ### Setting up a Single FreeBSD VM
@@ -35,10 +35,10 @@ I picked up Vagrant box 'bento/freebsd-11.2' to quickly create a VirtualBox vm r
 
 [^2]: I'm also testing WSL (Windows Subsystem for Linux). It's handy sometimes but it's not enough to be used as true UNIX/Linux environment. So I'm still using cygwin as a primary command-line workspace on Windows.
 ```
-$ mkdir -p ~/vagrant/learnstp
-$ cd ~/vagrant/learnstp
-$ vagrant init
-$ vim Vagrantfile
+HostOS$ mkdir -p ~/vagrant/learnstp
+HostOS$ cd ~/vagrant/learnstp
+HostOS$ vagrant init bento/freebsd-11.2
+HostOS$ vim Vagrantfile
 ```
 
 I edited the generated Vagrantfile in order to
@@ -62,10 +62,10 @@ Vagrant.configure("2") do |config|
 end
 ```
 
-Then I fired up the vm and loggged in via ssh.
+Then I fired up the vm and logged in via ssh.
 ```
-$ vagrant up
-$ vagrant ssh
+HostOS$ vagrant up
+HostOS$ vagrant ssh
 ```
 
 ### Building a Simple Network Manually
@@ -202,9 +202,9 @@ epair0a(R)   Discard       (R)epair1b
 
 </code></pre>
 
-Here, bridge1 had the smallest bridge id (priority/id pair) and was elected as the root bridge. All its member ports became designated ports (D). On bridge0 and bridge2, port closest to the root bridge became root port \(R). On the link between bridge0 and bridge2 (epair2), port on the smaller id bridge became designated port (D) and the other became alternate port (A). The alternate port (A) on bridge0 didn't go into forwarding state and discarded the traffic to prevent loop.
+Here, bridge1 had the smallest bridge id (priority/MAC address pair) and was elected as the root bridge. All its member ports became designated ports (D). On bridge0 and bridge2, port closest to the root bridge became root port \(R). On the link between bridge0 and bridge2 (epair2), port on the smaller id bridge became designated port (D) and the other became alternate port (A). The alternate port (A) on bridge0 didn't go into forwarding state and discarded the traffic to prevent loop.
 
-Okay. I could successfully build a Spanning Tree network. But before going any further, I wanted to do some more preparation.
+Okay. I could successfully build a Spanning Tree network using command-line. But before going any further, I wanted to do some more preparation.
 
 As you can see, it's quite tedious to configure bridges with ifconfig. In addition, It's also hard to see how the physical and logical topologies look like.
 
@@ -283,7 +283,7 @@ bridge2 <b class="gr">32768</b>.<b class="bl">02:00:80:00:0a:0b</b> desig root 3
   epair2a  proto rstp  id 128.11  cost   2000: designated / forwarding
 </code></pre>
 
-While MAC address is normally unique and not user-configurable, bridge priority is meant to be configured by administrator.
+While MAC address is normally unique and not user-configurable, bridge priority is to be configured by administrator.
 
 However, recommended default of the bridge priority is 32768 and FreeBSD's if_bridge is no exception. So without explicit configuration, bridge priorities could be the same across all bridges in a network. In that case, a bridge with the smallest MAC address is elected as a root bridge. This is effectively a random selection process.
 
@@ -302,7 +302,7 @@ Now let's try to make bridge0 a root bridge by configuring its bridge priority t
 $ sudo ifconfig bridge0 priority 0
 ```
 
-Change of bridge priority caused another election process and bridge0 became a new root bridge.
+Changeing bridge priority caused another election process and bridge0 became a new root bridge.
 
 ![3-bridge topology. bridge0 became a root](/images/learning-stp/rstp-3b-r0.jpg)
 
@@ -328,7 +328,7 @@ $ sudo ./bridge.sh ring -R 1 3
 ```
 
 ### Selecting a Root Port on Each Bridge
-For each non-root bridge, a single root port is selected based on its distance (cost) to the root bridge. Basically, a port with the least cost becomes the root port on a bridge.
+For each non-root bridge, a single root port is selected based on its distance (cost) to the root bridge. Basically, a port closest to the root bridge becomes the root port on a bridge.
 
 To calculate the distances, every RSTP-enabled port has a property called port pathcost. By default, it is automatically configured according to its link speed.
 
@@ -348,7 +348,7 @@ epair0a: flags=8943<UP,BROADCAST,RUNNING,PROMISC,SIMPLEX,MULTICAST> metric 0 mtu
 
 With this (all ports have pathcost 2000) in mind, let's look at each port's distance to the root bridge (it is called the port's root pathcost).
 
-On bridge1, epair0b's root pathcost is 2000 because bridge0 considers that the cost of the link attached to epair0b interface is 2000 and it is the only link required to reach the root bridge (bridge0). On the same bridge, epair1a's root pathcost is 4000 because there are two links (epair1 and epair2) between the interface and the root bridge thus the total root pathcost of epair1a is equal to 2000 + 2000. So, epair0b becomes the root port on bridge1 because it has the smallest root pathcost on the bridge.
+On bridge1, epair0b's root pathcost is 2000 because bridge1 considers that the cost of the link attached to epair0b interface is 2000 and it is the only link required to reach the root bridge (bridge0). On the same bridge, epair1a's root pathcost is 4000 because there are two links (epair1 and epair2) between the interface and the root bridge thus the total root pathcost of epair1a is equal to 2000 + 2000. So, epair0b becomes the root port on bridge1 because it has the smallest root pathcost on the bridge.
 
 On bridge2, epair2a is selected as the root port in the same way.
 
@@ -372,7 +372,7 @@ sudo ./bridge.sh connect bridge2 bridge3
 
 Those commands added bridge3 and linked it to bridge2 and bridge3 with newly created epair3 and epair4 respectively. Here bridge3 has two ports, epair3b and epair4b, which have the same root pathcost of 4000.
 
-If a bridge has multiple ports with the least root pathcost, it choose a port connected to a neighboring bridge with the lowest bridge id as the root port. In this case, bridge3's neighbors are bridge1 (Shortend id: 32768.00)  and bridge2 (Shortend id: 32768.01) and bridge1 has the lower bridge id. bridge3 chose epair3b as the root port because it is connected to the lowest id neighbor, bridge1.
+If a bridge has multiple ports with the same least root pathcost, it choose a port connected to a neighboring bridge with the lowest bridge id as the root port. In this case, bridge3's neighbors are bridge1 (shortened id: 32768.00)  and bridge2 (shortened id: 32768.01) and bridge1 has the lower bridge id. bridge3 chose epair3b as the root port because it is connected to the lowest id neighbor, bridge1.
 
 ![Root Port Selection with multiple equal-cost links 1](/images/learning-stp/rstp-4b-r0.jpg)
 
@@ -381,11 +381,11 @@ The second case can be observed by adding a parallel link between bridge0 and br
 sudo ./bridge.sh connect bridge0 bridge1
 ```
 
-This command added a new link epair5 between bridge0 and bridge1. Now bridge1 has two ports with the least root pathcost, epair0b and epair5b. This time, both ports also has the same neighbor, bridge0.
+This command added a new link epair5 between bridge0 and bridge1. Now bridge1 has two ports with the same least root pathcost, epair0b and epair5b. This time, both ports also has the same neighbor, bridge0.
 
-If a bridge has multiple ports with the least root pathcost and the same neighbor, it choose a port whose neighbor port has the lowest port id. A port id is comprised of a port priority and a port index (number). As with the bridge id, port priority can be user-configurable while port index is determined by the system. Recommended default value of the port priority is 128. On the visualization app, port ids are shown like 128.7 where 128 is a priority and 7 is a port index.
+If a bridge has multiple ports with the same least root pathcost and the same neighbor, it choose a port whose neighbor port has the lowest port id. A port id is comprised of a port priority and a port index (number). As with the bridge id, port priority can be user-configurable while port index is determined by the system. Recommended default value of the port priority is 128. On the visualization app, port ids are shown like 128.7 where 128 is a priority and 7 is a port index.
 
-In this example, epair0b's neighbor epair0a's port id is 128.7 and epair5b's neighbor epair5a's port id is 128.12. Therefore, bridge1 continued to use epair0b as the root bridge even after epair5a was added as a parallel link to bridge0.
+In this example, epair0b's neighbor epair0a's port id is 128.7 and epair5b's neighbor epair5a's port id is 128.18. Therefore, bridge1 continued to use epair0b as the root bridge even after epair5a was added as a parallel link to bridge0.
 
 ![Root Port Selection with multiple equal-cost links 2](/images/learning-stp/rstp-4b-r0a.jpg)
 
@@ -395,15 +395,15 @@ If you want bridge1 to use epair5b as its root port, you can set its neighbor po
 sudo ifconfig bridge0 ifpriority epair5a 64
 ```
 
-Now epair5b's neighbor epair5a's port id was changed to 64.12 while epair0b's neighbor epair0a's port id is unchanged at 128.7. So bridge1 changes its root port from epair0b to epair5b.
+Now epair5b's neighbor epair5a's port id was changed to 64.18 while epair0b's neighbor epair0a's port id is unchanged at 128.7. So bridge1 changes its root port from epair0b to epair5b.
 
 ![Root Port Selection with multiple equal-cost links 3](/images/learning-stp/rstp-4b-r0b.jpg)
 
 ### Determining Designated and Alternate Ports
 After selecting root ports, each bridge selects designated ports out of the remaining ports. I think a designated port is somewhat like a gateway in IP terminology. That is, a designated port is a port on a link through which another port on the link can reach the root bridge with the minimum root pathcost. I was confused with the distinction between selection processes of root port and designated port but in summary:
 
-* Root port is selected according to the distance FROM the port.
-* Designated port is selected according to the distance THROUGH the port, the bridge it belongs to and its root port.
+* Root port is selected according to the distance out FROM the port.
+* Designated port is selected according to the distance THROUGH the port and the bridge it belongs to.
 
 On each link, a port on a bridge whose root port has the lowest root pathcost becomes the designated port on that link. Then remaining ports which aren't selected as root or designated port become the alternate port [^5] and block traffic to prevent loop.
 
@@ -413,7 +413,7 @@ Let's look at an earlier example again.
 
 ![Designated and Alternate Ports](/images/learning-stp/rstp-3b-r0.jpg)
 
-All ports on the root bridge (epair0a and epair2b) become designated ports because those ports are apparently closest exits to the root bridge on their links (epair0 and epair2).
+All ports on the root bridge (epair0a and epair2b) become designated ports because those ports are apparently closest to the root bridge on their links (epair0 and epair2).
 
 On the link between bridge1 and bridge2 (epair1), epair1a on bridge1 and epair1b on bridge2 have the same root pathcost of 2000. In this case, a port belonging to the bridge with the lowest bridge id becomes the designated port on the link.
 
