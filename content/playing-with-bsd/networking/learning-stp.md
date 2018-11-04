@@ -1,7 +1,7 @@
 ---
 title: "Learning Spanning Tree Protocol with FreeBSD Bridges"
-date: 2018-11-04T12:13:01+09:00
-draft: true
+date: 2018-11-04T21:19:01+09:00
+draft: false
 tags: [ "network", "bridge", "stp", "freebsd" ]
 toc: true
 ---
@@ -455,6 +455,9 @@ $ sudo ./bridge.sh linkdown epair5
 
 Three out of six links were down now and logically four bridges were connected in line like bridge0 (root) - bridge2 (cost 2000) - bridge1 (cost 4000) - bridge3 (cost 6000).
 
+## Very Brief Conclusion
+I'm sure that there's a lot more to learn, but visualizing FreeBSD's real bridge operations greatly helped me understand fundamentals. For a text-oriented UNIX user like me, this was a really great lesson!
+
 ## References
 * Vagrant Cloud - Vagrant box bento/freebsd-11.2  
 https://app.vagrantup.com/bento/boxes/freebsd-11.2
@@ -483,3 +486,5 @@ https://svgjs.com/
 * Mojolicious - Perl real-time web framework  
 https://mojolicious.org/
 
+* GitHub: genneko/learnstp - Small programs to help experiment Spanning Tree Protocol with FreeBSD if_bridge  
+https://github.com/genneko/learnstp
