@@ -1,6 +1,6 @@
 ---
-title: "Abusing FreeBSD Bridges to Learn Spanning Tree Protocol"
-date: 2018-11-01T17:53:01+09:00
+title: "Learning Spanning Tree Protocol with FreeBSD Bridges"
+date: 2018-11-04T12:13:01+09:00
 draft: true
 tags: [ "network", "bridge", "stp", "freebsd" ]
 toc: true
@@ -20,6 +20,11 @@ I know there are things called network simulators and they are widely used for e
 This is definitely not a practical usage of FreeBSD [^1] but it's gonna be fun. So I am going to abuse FreeBSD bridges to see how RSTP works!
 
 [^1]: It's also not specific to FreeBSD. The same experiment must be possible with any other operating system which supports STP bridges. I just used my favorite OS.
+
+Please note:
+
+* This article just describes my experience and understadings. It's not meant to be an accurate explanation of the Spanning Tree Protocol.
+* In the following text, I used the words Spanning Tree, Spanning Tree Protocol and STP for Rapid Spanning Tree Protocol (RSTP).
 
 ## Preparation
 ### Setting up a Single FreeBSD VM
@@ -250,12 +255,12 @@ http://localhost:3000/index.html
 Now everything is in place.
 
 ## Seeing How RSTP Works
-### Root Bridge Election
+### Electing a Root Bridge in a Network
 For each Spanning Tree network, a single bridge is elected as a root bridge. A root bridge is literally a root of a logical tree of network links, which is calculated by bridges in the network.
 
 As the root bridge operates in the core of a network, it's so important to configure the most appropriate bridge as the root bridge. But how?
 
-In the Spanning Tree network, bridges exchange information and automatically elect a bridge with the lowest bridge id value as a root bridge in the network.
+In the Spanning Tree network, bridges exchange information using control messages (BPDUs) and automatically elect a bridge with the lowest bridge id value as a root bridge in the network.
 
 A bridge id is a 8 octets (= bytes) value and is made up of two components - a bridge priority and a bridge MAC address. In the previous example of three bridges, strings like '32768.02:00:80:00:0c:0b' are bridge ids. The first part (e.g. '32768') is the bridge priority and the second part (e.g. '02:00:80:00:0c:0b') is the bridge MAC address.
 
@@ -282,7 +287,7 @@ While MAC address is normally unique and not user-configurable, bridge priority 
 
 However, recommended default of the bridge priority is 32768 and FreeBSD's if_bridge is no exception. So without explicit configuration, bridge priorities could be the same across all bridges in a network. In that case, a bridge with the smallest MAC address is elected as a root bridge. This is effectively a random selection process.
 
-To avoid this, it is said that network administrators should set bridge priority of the candidate root bridge lower than other ordinary bridges.
+To avoid this unpredictable election process, it is said that network administrators should configure bridge priority of the root bridge candidate to be lower than other ordinary bridges.
 
 Because I didn't do that in the previous example, all bridges had the same priority value 32768 and bridge1, which happened to have the lowest MAC address among three became the root bridge.
 
@@ -322,7 +327,7 @@ For example, you can generate the same 3-bridge topology with the first bridge (
 $ sudo ./bridge.sh ring -R 1 3
 ```
 
-### Root Ports
+### Selecting a Root Port on Each Bridge
 For each non-root bridge, a single root port is selected based on its distance (cost) to the root bridge. Basically, a port with the least cost becomes the root port on a bridge.
 
 To calculate the distances, every RSTP-enabled port has a property called port pathcost. By default, it is automatically configured according to its link speed.
@@ -394,13 +399,15 @@ Now epair5b's neighbor epair5a's port id was changed to 64.12 while epair0b's ne
 
 ![Root Port Selection with multiple equal-cost links 3](/images/learning-stp/rstp-4b-r0b.jpg)
 
-### Designated and Alternate Ports
+### Determining Designated and Alternate Ports
 After selecting root ports, each bridge selects designated ports out of the remaining ports. I think a designated port is somewhat like a gateway in IP terminology. That is, a designated port is a port on a link through which another port on the link can reach the root bridge with the minimum root pathcost. I was confused with the distinction between selection processes of root port and designated port but in summary:
 
 * Root port is selected according to the distance FROM the port.
 * Designated port is selected according to the distance THROUGH the port, the bridge it belongs to and its root port.
 
-On each link, a port on a bridge whose root port has the lowest root pathcost becomes the designated port on that link. Then remaining ports which aren't selected as root or designated port become the alternate port and block traffic to prevent loop.
+On each link, a port on a bridge whose root port has the lowest root pathcost becomes the designated port on that link. Then remaining ports which aren't selected as root or designated port become the alternate port [^5] and block traffic to prevent loop.
+
+[^5]: There's also a port role called "backup port". It's only used when multiple ports on a bridge are connected to the same shared media like a repeater hub (non-switching hub). In such a case, ports with non-optimal port id become backup port. I could produced this situation by attaching both ends of a epair to the same bridge but I think it's rare to use such configuration so I didn't go deeper on this subject.
 
 Let's look at an earlier example again. 
 
@@ -412,7 +419,7 @@ On the link between bridge1 and bridge2 (epair1), epair1a on bridge1 and epair1b
 
 Here bridge1's (shortened) id is 32768.00 while bridge2's is 32768.01, thus on epair1 link epair1a on bridge1 became the designated port and epair1b on bridge2 became the alternate port.
 
-### Topology Changes
+### Reacting to Topology Changes
 Next I wanted to see how RSTP reacts to topology changes.
 
 For this, I wiped the previous topology and created 4-bridge full-mesh topology with the following commands.
@@ -425,41 +432,28 @@ $ sudo ./bridge.sh mesh -R 1 4
 
 Here bridge0 became the root bridge. Other bridges selected their ports directly connected to the root bridge (epair0b on bridge1, epair1b on bridge2 and epair2b on bridge3) as the root ports.
 
-On each of the other links (epair3, epair4 and epair5), ports on both ends have the same pathcosts through its bridge's root port. So on each link, a port on the lowest id bridge became the designated port and another port became the alternate port.
+On each of the other links (epair3, epair4 and epair5), ports on both ends have the same pathcosts through its bridge's root port. So on each of those links, a port on the lowest id bridge became the designated port and another port became the alternate port.
 
-## Quick Start
-1. Install the prerequisites.
+First, I brought down epair0 between bridge0 and bridge1.
 ```
-$ sudo pkg install git-lite p5-Mojolicious
-```
-
-2. Install the scripts and web application.
-```
-$ mkdir ~/src
-$ cd ~/src
-$ git clone https://github.com/genneko/learnstp.git
-$ cd learnstp
+$ sudo ./bridge.sh linkdown epair0
 ```
 
-3. Create a topology where four bridges are meshed together.
+As bridge1's root port was changed from epair0b to epair3a, a path to the root bridge (bridge0) from bridge1 was now bridge1 - bridge2 - bridge0 and its pathcost was increased to 4000. 
+
+![4 Bridge Mesh Topology 2](/images/learning-stp/rstp-4b-mesh-02.jpg)
+
+Bridge1 had two candidates for the new root port, epair3a and epair4a. Because both had the same root pathcost of 4000, neighbor bridge ids were used to determine the root port thus epair3a (neighbor bridge id was 32768.01) was selected over epair4a (neighbor bridge id was 32768.02).
+
+Now let's generate an exterme situation. I ran the following commands to do this.
 ```
-$ sudo ./bridge.sh mesh
+$ sudo ./bridge.sh linkdown epair2
+$ sudo ./bridge.sh linkdown epair5
 ```
 
-4. Run the web application.
-```
-$ ./run-app.sh
-```
+![4 Bridge Mesh Topology 3](/images/learning-stp/rstp-4b-mesh-03.jpg)
 
-5. Access the web application from the host OS's web browser.
-```
-http://localhost:3000/index.html
-```
-
-6. Bring down some link to see how the logical topology changes.
-```
-$ sudo ./bridge.sh linkdown epair1
-```
+Three out of six links were down now and logically four bridges were connected in line like bridge0 (root) - bridge2 (cost 2000) - bridge1 (cost 4000) - bridge3 (cost 6000).
 
 ## References
 * Vagrant Cloud - Vagrant box bento/freebsd-11.2  
