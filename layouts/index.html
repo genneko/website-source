@@ -14,7 +14,7 @@
 
             <ul class="section-article-list">
               {{ range first $maxarticle .Pages }}
-                <li><time>{{ .Date.Format (default "January 2, 2006" $.Site.Params.dateFormat) }}</time> - <a href="{{ .Permalink | relLangURL }}">{{ .Title }}</a>
+                <li><time>{{ .Date.Format (default "January 2, 2006" $.Site.Params.dateFormat) }}</time> - <a href="{{ .Permalink | relURL }}">{{ .Title }}</a>
               {{ end }}
 
               {{ if ge $morearticle 1 }}
