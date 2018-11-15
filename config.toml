@@ -27,9 +27,11 @@ DefaultContentLanguage = "en"
 [languages]
 [languages.en]
 weight = 1
+languageName = "English"
 
 [languages.ja]
 weight = 2
+languageName = "日本語"
 
 [params]
   # Date format

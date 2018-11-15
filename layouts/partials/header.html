@@ -10,6 +10,15 @@
       <li class="site-navi-item-{{ .Identifier }}"><a href="{{ .URL | relLangURL | safeURL }}" title="{{ .Name }}">{{ .Name }}</a></li>
       {{- end }}
     </ul>
+    <ul class="site-navi-items">
+      {{ if .IsTranslated }}
+        {{ range .AllTranslations }}
+          {{ if ne $.Site.Language.Lang .Language.Lang }}
+            <li><a rel="alternate" href="{{ .RelPermalink }}" hreflang="{{ .Lang }}" lang="{{ .Lang }}">{{ .Language.LanguageName }}</a></li>
+          {{ end -}}
+        {{ end -}}
+      {{ end }}
+      </ul>
   </nav>
 </header>
 <hr class="site-header-bottom">
