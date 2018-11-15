@@ -1,12 +1,11 @@
 +++
 title = "About"
 date = "2018-08-31"
-description = "About this site."
+description = "このサイトについて"
 +++
-I'm not a professional sysadmin or developer  
-but have been an enthusiastic user of open source software,  
-especially UNIX-like operating systems.  
+プロのシステム管理者でも開発者でもないけれど  
+オープンソースソフトウェア、とりわけUNIXライクOSを愛する一ユーザーです。
 
-On this website,  
-I'm trying to write about my experiences (or experiments)  
-in the hope that someday they will help someone in similar situations.  
+こんなシロウトの覚え書きでも、いつか誰かの役に立つことがあるかもしれない、  
+そんな思いから、自分の経験を書き残すことにしました。
+

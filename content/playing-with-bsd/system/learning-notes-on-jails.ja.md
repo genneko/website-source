@@ -1,5 +1,5 @@
 ---
-title: "FreeBSD Jails学習帳"
+title: "FreeBSD Jails 学習ノート"
 date: 2018-10-07T18:35:49+09:00
 draft: false
 tags: [ "freebsd", "jail", "virtualization", "administration" ]
@@ -544,4 +544,7 @@ https://mwl.io/nonfiction/os#fmaz
 
 * FreeBSD Mastery: Specialty Filesystems by Michael W. Lucas  
 https://mwl.io/nonfiction/os#fmsf
+
+* GitHub: genneko/freebsd-vimage-jails
+https://github.com/genneko/freebsd-vimage-jails
 
