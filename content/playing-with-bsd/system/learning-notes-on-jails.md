@@ -545,3 +545,6 @@ https://mwl.io/nonfiction/os#fmaz
 * FreeBSD Mastery: Specialty Filesystems by Michael W. Lucas  
 https://mwl.io/nonfiction/os#fmsf
 
+* GitHub: genneko/freebsd-vimage-jails
+https://github.com/genneko/freebsd-vimage-jails
+
