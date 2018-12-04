@@ -160,10 +160,10 @@ https://tunnelbroker.net/
 https://forums.he.net/
 
 * FreeBSD Manual Pages: rtadvd.conf(5)  
-https://www.freebsd.org/cgi/man.cgi?rtadvd.conf(5)
+<https://www.freebsd.org/cgi/man.cgi?rtadvd.conf(5)>
 
 * FreeBSD Manual Pages: pf.conf(5)  
-https://www.freebsd.org/cgi/man.cgi?pf.conf(5)
+<https://www.freebsd.org/cgi/man.cgi?pf.conf(5)>
 
 * The Book of PF by Peter N. M. Hansteen  
 https://nostarch.com/pf3

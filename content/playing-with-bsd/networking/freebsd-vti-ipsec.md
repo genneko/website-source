@@ -5,7 +5,7 @@ draft: false
 tags: [ "network", "vpn", "ipsec", "freebsd" ]
 toc: true
 ---
-I have managed to setup route-based IPsec VPN with FreeBSD-11.1 RC3, which had introduced ipsec virtual tunnel interface.
+I have managed to setup route-based IPsec VPN with FreeBSD-11.1 RC3, which had introduced ipsec virtual tunnel interface if_ipsec(4).
 Here is a record of my experiment just for your information.
 
 ## Prerequisite
@@ -120,8 +120,11 @@ https://wiki.strongswan.org/issues/2214
 * FreeBSD Phabricator: P112 Route based IPsec  
 https://reviews.freebsd.org/P112
 
+* FreeBSD Manual Pages: if_ipsec(4)  
+<https://www.freebsd.org/cgi/man.cgi?query=if_ipsec(4)>
+
 * FreeBSD Manual Pages: ipsec.conf(5)  
-https://www.freebsd.org/cgi/man.cgi?query=ipsec.conf(5)
+<https://www.freebsd.org/cgi/man.cgi?query=ipsec.conf(5)>
 
 * FreeBSD Manual Pages: strongswan.conf(5)  
-https://www.freebsd.org/cgi/man.cgi?query=strongswan.conf(5)
+<https://www.freebsd.org/cgi/man.cgi?query=strongswan.conf(5)>

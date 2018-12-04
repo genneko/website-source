@@ -463,13 +463,13 @@ I'm sure that there's a lot more to learn, but visualizing FreeBSD's real bridge
 https://app.vagrantup.com/bento/boxes/freebsd-11.2
 
 * FreeBSD Manual: ifconfig(8)  
-https://www.freebsd.org/cgi/man.cgi?ifconfig(8)
+<https://www.freebsd.org/cgi/man.cgi?ifconfig(8)>
 
 * FreeBSD Manual: if_bridge(4)  
-https://www.freebsd.org/cgi/man.cgi?if_bridge(4)
+<https://www.freebsd.org/cgi/man.cgi?if_bridge(4)>
 
 * FreeBSD Manual: epair(4)  
-https://www.freebsd.org/cgi/man.cgi?epair(4)
+<https://www.freebsd.org/cgi/man.cgi?epair(4)>
 
 * FreeBSD Handbook: Advanced Networking / Bridging  
 https://www.freebsd.org/doc/en_US.ISO8859-1/books/handbook/network-bridging.html
