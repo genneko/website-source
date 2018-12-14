@@ -51,7 +51,7 @@ Here I'm going to create a FreeBSD 11.2 template in /vm/tmpl/11.2.
 Usually /etc/resolv.conf is also copied from the host, but after some experiments I decided to copy it by using /etc/jail.conf's exec.prestart and delete it by exec.poststop.
 
 	```
-	sudo cp /etc/localtime etc/
+	sudo cp /etc/localtime /vm/tmpl/11.2/etc/
 	```
 
 5. Write a minimum /etc/rc.conf for the template.  
@@ -59,7 +59,7 @@ Here I disable cron in jails but it might be better to leave it enabled and fine
 I need more research on this.
 
 	```
-	sudo vi etc/rc.conf
+	sudo vi /vm/tmpl/11.2/etc/rc.conf
 	```
 
 	```
@@ -75,7 +75,7 @@ I need more research on this.
 Obviously this is not necessary because I disabled cron in the previous step but I do this as a precaution anyway.
 
 	```
-	sudo vi etc/crontab
+	sudo vi /vm/tmpl/11.2/etc/crontab
 	```
 
 	```
@@ -89,7 +89,7 @@ Also create /etc/make.conf to use the directories for building ports in jails.
 	```
 	sudo mkdir /vm/tmpl/11.2/usr/ports
 	sudo mkdir -p /vm/tmpl/11.2/var/ports/{distfiles,packages}
-	sudo vi etc/make.conf
+	sudo vi /vm/tmpl/11.2/etc/make.conf
 	```
 
 	```
@@ -328,8 +328,8 @@ unsetenv UNAME_r
 Sometimes I feel that jails networking is not always intuitive.
 
 In my current understanding, a standard (non-VNET) jail shares its IP address with the host.  
-A jail's address is actually an IP alias (secondary address) on the host which is temporariliy given to the jail.  
 If the jail doesn't listen to a specific TCP or UDP port on the address, packets destined to the port/address are processed by the host.  
+A jail's address is usually an IP alias (secondary address) on the host but it's not limited to that. Actually a jail can use the host's primary IP address unless the host and the jail doesn't use the same ports.  
 I think this behavior is confusing because I expect that the host and jails can be viewed as spearate systems.
 
 It's also hard to understand at first that jail's 127.0.0.1 is mapped to an address deligated to the jail, inter-jail communications go through lo0 even if jails' addresses are assigned to lo1 and so on.
@@ -337,6 +337,9 @@ It's also hard to understand at first that jail's 127.0.0.1 is mapped to an addr
 In this regard, VNET jails look simpler to me.  
 So I gave it a try despite the fact that they require custom kernel with VIMAGE feature enabled (I completely got used to using binary updates with GENERIC kernel and almost forgot the time when I always rebuilt kernel to slim it down).
 
+_GOOD NEWS! (2018-12-14)  
+VIMAGE is enabled by default on FreeBSD 12.0.  
+If you are using the version, you don't have to recompile your kernel._
 
 ### Installing and Updating FreeBSD Source
 #### From Distribution Tarball
