@@ -44,7 +44,7 @@ HostOS$ vim Vagrantfile
 I edited the generated Vagrantfile in order to
 
 * set a memorable name for the vm.
-* add port fowarding rule for a web application which visualizes topology.
+* add port forwarding rule for a web application which visualizes topology.
 * enable vm console.
 * set a limit on vm's cpu usage.
 

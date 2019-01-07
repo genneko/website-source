@@ -119,16 +119,16 @@ Usually, I use clone for quick testing while I prefer zfs send/receive for produ
 ### By ZFS Clone
 Create four jails h1, h2, h3 and h4 by cloning the 11.2 template's p3 snapshot.
 ```
-for host in h1 h2 h3 h4; do
-    sudo zfs clone zroot/vm/tmpl/11.2@p3 zroot/vm/$host
+for jail in h1 h2 h3 h4; do
+    sudo zfs clone zroot/vm/tmpl/11.2@p3 zroot/vm/$jail
 done
 ```
 
 ### By ZFS Send/Receive
 Create four jails h1, h2, h3 and h4 by sending/receiving the 11.2 template's p3 snapshot.
 ```
-for host in h1 h2 h3 h4; do
-    sudo sh -c "zfs send zroot/vm/tmpl/11.2@p3 | zfs receive zroot/vm/$host"
+for jail in h1 h2 h3 h4; do
+    sudo sh -c "zfs send zroot/vm/tmpl/11.2@p3 | zfs receive zroot/vm/$jail"
 done
 ```
 
@@ -299,8 +299,8 @@ sudp pkg -j h1 install git-lite vim-console
 
 Update package repositories on multiple jails using shell's for loop.
 ```
-for host in $(jls name); do
-  sudo pkg -j $host update
+for jail in $(jls name); do
+  sudo pkg -j $jail update
 done
 ```
 
@@ -376,7 +376,7 @@ sudo shutdown -r now
 ```
 
 #### Minimum Configuration
-To add only VIMAGE to GENERIC, create a kernel configuration file with the following content.
+To add only VIMAGE to GENERIC, create a kernel configuration file with the following content.  
 [/usr/src/sys/amd64/conf/VIMAGE]
 ```
 include GENERIC
