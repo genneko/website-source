@@ -43,3 +43,11 @@ body {
 .section-article-list li {
   margin-top: 1ex;
 }
+.updated {
+  color: #ffffff;
+  background-color: #6b8e23;
+  margin: 5px;
+  border-radius: 5px;
+  padding: 0px 3px 2px 3px;
+}
+

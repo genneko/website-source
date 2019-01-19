@@ -14,7 +14,10 @@
 
             <ul class="section-article-list">
               {{ range first $maxarticle .Pages }}
-                <li><time>{{ .Date.Format (default "January 2, 2006" $.Site.Params.dateFormat) }}</time> - <a href="{{ .Permalink | relURL }}">{{ .Title }}</a>
+              <li><time>{{ .Date.Format (default "January 2, 2006" $.Site.Params.dateFormat) }}</time> - <a href="{{ .Permalink | relURL }}">{{ .Title }}</a>
+                  {{ if gt .Lastmod .Date }}
+                  <span class="updated">Update: {{ .Lastmod.Format (default "January 2, 2006" $.Site.Params.dateFormat) }}</span>
+                  {{ end }}
               {{ end }}
 
               {{ if ge $morearticle 1 }}
