@@ -203,14 +203,14 @@ h4 {
 ```
 
 ### Per-Jail fstab
-If you want some directories on the host to be visible in jails, create a fstab containing nullfs mount entries for each jail and specify it in /etc/jail.conf's **mount.fstab** parameter.
+If you want some directories on the host to be visible in jails, create a fstab containing nullfs mount entries for each jail and specify it in /etc/jail.conf's ``mount.fstab`` parameter.
 
 [/vm/h1.fstab]
 ```
 /usr/ports /vm/h1/usr/ports nullfs ro 0 0
 ```
 
-Or you can also use **mount** parameter to specify a single line of fstab entry directly in /etc/jail.conf.
+Or you can also use ``mount`` parameter to specify a single line of fstab entry directly in /etc/jail.conf.
 
 [/etc/jail.conf]
 ```
@@ -570,7 +570,7 @@ In this configuration, one jail acts as a central router which roughly emulates 
                                  Site 2
 </code></pre>
 
-To use tcpdump on the central router (r1), define the following devfs ruleset which is specified by **devfs_ruleset** parameter in /etc/jail.conf.
+To use tcpdump on the central router (r1), define the following devfs ruleset which is specified by ``devfs_ruleset`` parameter in /etc/jail.conf.
 
 [/etc/devfs.rules]  
 ```
@@ -693,6 +693,7 @@ vpnh2 {
 }
 ```
 
+##### pkg without Network Connection
 Because the jails in this configuration cannot access outside network, ``pkg install`` cannot be used. Instead you can use ``pkg add`` to install the package files downloaded with ``pkg fetch``.
 
 I use the following procedures.
