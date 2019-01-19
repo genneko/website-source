@@ -1,7 +1,7 @@
 ---
 title: "Learning Notes on FreeBSD Jails"
 date: 2018-10-07T18:35:49+09:00
-lastmod: 2018-12-14T20:42:00+09:00
+lastmod: 2019-01-19T19:48:00+09:00
 draft: false
 tags: [ "freebsd", "jail", "virtualization", "administration" ]
 toc: true
@@ -203,9 +203,20 @@ h4 {
 ```
 
 ### Per-Jail fstab
+If you want some directories on the host to be visible in jails, create a fstab containing nullfs mount entries for each jail and specify it in /etc/jail.conf's **mount.fstab** parameter.
+
 [/vm/h1.fstab]
 ```
 /usr/ports /vm/h1/usr/ports nullfs ro 0 0
+```
+
+Or you can also use **mount** parameter to specify a single line of fstab entry directly in /etc/jail.conf.
+
+[/etc/jail.conf]
+```
+...
+mount = "/usr/ports /vm/${name}/usr/ports nullfs ro 0 0";
+...
 ```
 
 ### NAT Configuration
@@ -506,20 +517,216 @@ v1 {
 }
 ```
 
-### Enabling Packet Forwarding on the Host
 For a routed configuration, IP packet forwarding should be enabled to allow the jail to go out to the internet.  
-IPv4 packet forwarding can be controlled by sysctl variables ``net.inet.ip.forwarding``.  
-It can be configured in /etc/sysctl.conf but the following line in /etc/rc.conf looks nicer to me.
+IPv4/IPv6 packet forwarding can be controlled by sysctl variables ``net.inet.ip.forwarding`` and ``net.inet6.ip6.forwarding``.  
+Packet forwarding can be enabled dynamically by running the following commands.  
+```
+sysctl net.inet.ip.forwarding=1
+sysctl net.inet6.ip6.forwarding=1
+```
+
+To make those configurations permanent, they can be configured in /etc/sysctl.conf but the following line in /etc/rc.conf looks nicer to me.
 
 [/etc/rc.conf]
 ```
 gateway_enable="YES"
-```
-
-For IPv6, use the following configuration.
-```
 ipv6_gateway_enable="YES"
 ```
+
+#### Separate Network Configuration
+This is an example configuration for five VNET jails in a network separated from the host. I use this configuration to experiment VPN software such as WireGuard.
+
+In this configuration, one jail acts as a central router which roughly emulates a public network and is to be used as a monitoring post running tcpdump, two are VPN-capable edge routers on private sites and remaining two are hosts on the private sites.
+
+* r1 (Router forwarding packets between vpnr1 and vpnr2.
+* vpnr1 (VPN Router for the site 1)
+* vpnr2 (VPN Router for the site 2)
+* vpnh1 (Host on the site 1)
+* vpnh2 (Host on the site 2)
+
+<pre style="line-height: 10pt"><code style="font-size: 9pt">                                 Site 1
+
+                      vri1_vpnr1      vri1_vpnh1
+       [Router(vpnr1)]o ------ (vri1br) ------ o[Host (vpnh1)]
+     vi1_vpnr1 o      192.168.1.1   192.168.1.11
+   172.31.1.11 |
+               |
+            (vi1br)
+               |
+   172.31.1.1  |
+        vi1_r1 o
+          [Router(r1)]
+        vi2_r1 o
+   172.31.2.1  |
+               |
+            (vi2br)
+               |
+   172.31.2.11 |
+               |
+     vi2_vpnr2 o      192.168.2.1   192.168.2.11
+       [Router(vpnr2)]o ------ (vri2br) ------ o[Host (vpnh2)]
+                      vri2_vpnr2      vri2_vpnh2
+
+                                 Site 2
+</code></pre>
+
+To use tcpdump on the central router (r1), define the following devfs ruleset which is specified by **devfs_ruleset** parameter in /etc/jail.conf.
+
+[/etc/devfs.rules]  
+```
+[devfsrules_bpfjail=10]
+add include $devfsrules_jail
+add path 'bpf*' unhide
+```
+
+The whole jail.conf looks like this.
+
+[/etc/jail.conf]  
+```
+exec.start = "/bin/sh /etc/rc";
+exec.stop = "/bin/sh /etc/rc.shutdown";
+exec.clean;
+mount.devfs;
+
+host.hostname = $name;
+path = "/vm/$name";
+exec.consolelog = "/var/log/jail_${name}_console.log";
+
+allow.chflags;
+allow.raw_sockets;
+mount = "/var/cache/pkg /vm/${name}/mnt nullfs ro 0 0";
+
+r1 {
+        $net1 = "vi1";
+        $ipv41 = "172.31.1.1";
+
+        $net2 = "vi2";
+        $ipv42 = "172.31.2.1";
+
+        $plen = 24;
+
+        vnet;
+        vnet.interface = ${net1}_$name, ${net2}_$name;
+        exec.prestart += "vnet add -b $net1 ${net1}_$name";
+        exec.prestart += "vnet add -b $net2 ${net2}_$name";
+        exec.start += "ifconfig ${net1}_$name $ipv41/$plen";
+        exec.start += "ifconfig ${net2}_$name $ipv42/$plen";
+        exec.start += "sysctl net.inet.ip.forwarding=1";
+        exec.poststop += "vnet delete $net1 ${net1}_$name";
+        exec.poststop += "vnet delete $net2 ${net2}_$name";
+
+        devfs_ruleset = 10;
+}
+
+vpnr1 {
+        $net1 = "vi1";
+        $ipv41 = "172.31.1.11";
+
+        $net2 = "vri1";
+        $ipv42 = "192.168.1.1";
+
+        $gwv4 = "172.31.1.1";
+        $plen = 24;
+
+        vnet;
+        vnet.interface = ${net1}_$name, ${net2}_$name;
+        exec.prestart += "vnet add -b $net1 ${net1}_$name";
+        exec.prestart += "vnet add -b $net2 ${net2}_$name";
+        exec.start += "ifconfig ${net1}_$name $ipv41/$plen";
+        exec.start += "ifconfig ${net2}_$name $ipv42/$plen";
+        exec.start += "route add default $gwv4";
+        exec.start += "sysctl net.inet.ip.forwarding=1";
+        exec.poststop += "vnet delete $net1 ${net1}_$name";
+        exec.poststop += "vnet delete $net2 ${net2}_$name";
+}
+
+vpnr2 {
+        $net1 = "vi2";
+        $ipv41 = "172.31.2.11";
+
+        $net2 = "vri2";
+        $ipv42 = "192.168.2.1";
+
+        $gwv4 = "172.31.2.1";
+        $plen = 24;
+
+        vnet;
+        vnet.interface = ${net1}_$name, ${net2}_$name;
+        exec.prestart += "vnet add -b $net1 ${net1}_$name";
+        exec.prestart += "vnet add -b $net2 ${net2}_$name";
+        exec.start += "ifconfig ${net1}_$name $ipv41/$plen";
+        exec.start += "ifconfig ${net2}_$name $ipv42/$plen";
+        exec.start += "route add default $gwv4";
+        exec.start += "sysctl net.inet.ip.forwarding=1";
+        exec.poststop += "vnet delete $net1 ${net1}_$name";
+        exec.poststop += "vnet delete $net2 ${net2}_$name";
+}
+
+vpnh1 {
+        $net = "vri1";
+        $ipv4 = "192.168.1.11";
+
+        $gwv4 = "192.168.1.1";
+        $plen = 24;
+
+        vnet;
+        vnet.interface = "${net}_$name";
+        exec.prestart += "vnet add -b ${net} ${net}_$name";
+        exec.start += "ifconfig ${net}_$name $ipv4/$plen";
+        exec.start += "route add default $gwv4";
+        exec.poststop += "vnet delete $net ${net}_$name";
+}
+
+vpnh2 {
+        $net = "vri2";
+        $ipv4 = "192.168.2.11";
+
+        $gwv4 = "192.168.2.1";
+        $plen = 24;
+
+        vnet;
+        vnet.interface = "${net}_$name";
+        exec.prestart += "vnet add -b ${net} ${net}_$name";
+        exec.start += "ifconfig ${net}_$name $ipv4/$plen";
+        exec.start += "route add default $gwv4";
+        exec.poststop += "vnet delete $net ${net}_$name";
+}
+```
+
+Because the jails in this configuration cannot access outside network, ``pkg install`` cannot be used. Instead you can use ``pkg add`` to install the package files downloaded with ``pkg fetch``.
+
+I use the following procedures.
+
+1. Download package files on the host.  
+With -d option, ``pkg fetch`` downloads the specified package plus its dependencies.  
+Downloaded files are stored in the host's /var/cache/pkg.
+```
+pkg fetch -d wireguard
+```
+
+2. Make the downloaded package files available to jails.  
+Although you can simply copy the files to jails' filesystem but nullfs mount /var/cache/pkg is much better and easier.  
+The following line in /etc/jail.conf achieves this.  The host's /var/cache/pkg is mounted on the jails' /mnt directory.
+```
+mount = "/var/cache/pkg /vm/${name}/mnt nullfs ro 0 0";
+```
+
+3. Start the jails and install the package from the host.  
+```
+pkg -j h1 add /mnt/wireguard-0.0.20181218.txz
+[h1] Installing wireguard-0.0.20181218...
+[h1] `-- Installing bash-4.4.23_1...
+[h1] |   `-- Installing gettext-runtime-0.19.8.1_2...
+[h1] |   | `-- Installing indexinfo-0.3.1...
+[h1] |   | `-- Extracting indexinfo-0.3.1: 100%
+[h1] |   `-- Extracting gettext-runtime-0.19.8.1_2: 100%
+[h1] `-- Extracting bash-4.4.23_1: 100%
+[h1] `-- Installing wireguard-go-0.0.20181222...
+[h1] `-- Extracting wireguard-go-0.0.20181222: 100%
+[h1] Extracting wireguard-0.0.20181218: 100%
+```
+
+A story about experimenting WireGuard will be on another post.
 
 ## References
 * FreeBSD Handbook: Jails  
@@ -551,3 +758,8 @@ https://mwl.io/nonfiction/os#fmsf
 
 * GitHub: genneko/freebsd-vimage-jails  
 https://github.com/genneko/freebsd-vimage-jails
+
+## Revision History
+* 2018-10-07: Created
+* 2018-12-14: Add a note on FreeBSD 12.0
+* 2019-01-19: Add "Separate Network Configuration" to "VNET Jails"
