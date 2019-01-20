@@ -379,7 +379,7 @@ service wireguard start
 
 ## Caveats
 
-### On VNET Jails, wgX cannot be destroyed.  
+### On VNET Jails, wgX cannot be destroyed
 This is true for both manual and rc.d setup but not the case in non-Jail environment.  
 Because of this, ``service wireguard stop`` in a jail gets stuck when it waits for the interface to be destroyed.
 
