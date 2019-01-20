@@ -534,13 +534,13 @@ ipv6_gateway_enable="YES"
 ```
 
 #### Separate Network Configuration
-This is an example configuration for five VNET jails in a network separated from the host. I use this configuration to experiment VPN software such as WireGuard.
+This is an example configuration for five VNET jails in a network separated from the host. I use this configuration to experiment network software such as VPN.
 
-In this configuration, one jail acts as a central router which roughly emulates a public network and is to be used as a monitoring post running tcpdump, two are VPN-capable edge routers on private sites and remaining two are hosts on the private sites.
+In this configuration, one jail acts as a central router which crudely emulates a public network and is to be used as a monitoring post running tcpdump, two are routers on private sites and remaining two are hosts on the private sites.
 
 * r1 (Router forwarding packets between vpnr1 and vpnr2.
-* vpnr1 (VPN Router for the site 1)
-* vpnr2 (VPN Router for the site 2)
+* vpnr1 (Router for the site 1)
+* vpnr2 (Router for the site 2)
 * vpnh1 (Host on the site 1)
 * vpnh2 (Host on the site 2)
 
@@ -577,6 +577,10 @@ To use tcpdump on the central router (r1), define the following devfs ruleset wh
 [devfsrules_bpfjail=10]
 add include $devfsrules_jail
 add path 'bpf*' unhide
+
+[devfsrules_tunjail=11]
+add include $devfsrules_jail
+add path 'tun*' unhide
 ```
 
 The whole jail.conf looks like this.
@@ -638,6 +642,8 @@ vpnr1 {
         exec.start += "sysctl net.inet.ip.forwarding=1";
         exec.poststop += "vnet delete $net1 ${net1}_$name";
         exec.poststop += "vnet delete $net2 ${net2}_$name";
+
+        devfs_ruleset = 11;
 }
 
 vpnr2 {
@@ -660,6 +666,8 @@ vpnr2 {
         exec.start += "sysctl net.inet.ip.forwarding=1";
         exec.poststop += "vnet delete $net1 ${net1}_$name";
         exec.poststop += "vnet delete $net2 ${net2}_$name";
+
+        devfs_ruleset = 11;
 }
 
 vpnh1 {
@@ -714,20 +722,18 @@ mount = "/var/cache/pkg /vm/${name}/mnt nullfs ro 0 0";
 
 3. Start the jails and install the package from the host.  
 ```
-pkg -j h1 add /mnt/wireguard-0.0.20181218.txz
-[h1] Installing wireguard-0.0.20181218...
-[h1] `-- Installing bash-4.4.23_1...
-[h1] |   `-- Installing gettext-runtime-0.19.8.1_2...
-[h1] |   | `-- Installing indexinfo-0.3.1...
-[h1] |   | `-- Extracting indexinfo-0.3.1: 100%
-[h1] |   `-- Extracting gettext-runtime-0.19.8.1_2: 100%
-[h1] `-- Extracting bash-4.4.23_1: 100%
-[h1] `-- Installing wireguard-go-0.0.20181222...
-[h1] `-- Extracting wireguard-go-0.0.20181222: 100%
-[h1] Extracting wireguard-0.0.20181218: 100%
+pkg -j vpnr1 add /mnt/wireguard-0.0.20181218.txz
+[vpnr1] Installing wireguard-0.0.20181218...
+[vpnr1] `-- Installing bash-4.4.23_1...
+[vpnr1] |   `-- Installing gettext-runtime-0.19.8.1_2...
+[vpnr1] |   | `-- Installing indexinfo-0.3.1...
+[vpnr1] |   | `-- Extracting indexinfo-0.3.1: 100%
+[vpnr1] |   `-- Extracting gettext-runtime-0.19.8.1_2: 100%
+[vpnr1] `-- Extracting bash-4.4.23_1: 100%
+[vpnr1] `-- Installing wireguard-go-0.0.20181222...
+[vpnr1] `-- Extracting wireguard-go-0.0.20181222: 100%
+[vpnr1] Extracting wireguard-0.0.20181218: 100%
 ```
-
-A story about experimenting WireGuard will be on another post.
 
 ## References
 * FreeBSD Handbook: Jails  
