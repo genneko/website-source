@@ -1,5 +1,5 @@
 ---
-title: "WireGuard on FreeBSD Quick Look: Site-to-Site VPN"
+title: "WireGuard on FreeBSD Quick Look: Testing VPN in Jail Network"
 date: 2019-01-20T15:47:34+09:00
 draft: false
 tags: [ "network", "vpn", "wireguard", "freebsd" ]
@@ -395,14 +395,15 @@ ifconfig wg0 name tun0
 ifconfig tun0 destroy
 ```
 
-wireguard-go initially creates a tun interface then renames it to the one specified on command-line. I could avoid this cannot-destroy problem by using tunX (e.g. tun1) for WireGuard interface name, but specifying tun0 failed with the following message. This seems to be fixed by adding a simple check to wireguard-go's CreateTUN() function in tun/tun_freebsd.go.
+wireguard-go initially creates a tun interface then renames it to the one specified on command-line. I could workaround this can't-destroy problem by using tunX (e.g. tun1) as a WireGuard interface name from the beginning, but specifying tun0 failed with the following message.
 ```
 ERROR: (tun0) 2019/01/20 05:51:29 Failed to create TUN device: failed to rename tun0 to tun0: file exists
 ```
+I think this can be fixed by adding a simple check to wireguard-go's CreateTUN() function in tun/tun_freebsd.go.
 
-For the fact that wg0 cannot be destroyed in jails, I'm not sure what is the root cause of this. But I noticed some weirdness in tun interface's unit number assignment.
+For the fact that wg0 cannot be destroyed in jails, I'm not sure what the root cause is. But I noticed some weirdness in tun interface's unit number assignment.
 
-It seems that when I create tun0 on a jail, I cannot create tun0 on other jails nor the host.
+When I created tun0 on one jail, I couldn't create tun0 on other jails nor the host.
 ```
 vpnr1# ifconfig tun create
 tun0
@@ -420,11 +421,11 @@ host# ifconfig tun create
 tun2
 ```
 
-Does it mean that if_tun's unit number is assigned across all jails and host?  
-As far as I know, other interface types such as lo and gif seems to have separate unit number namespace for each jail.
+I wonder if it means that if_tun's unit number is assigned sequentially across all jails and host?  
+As far as I know, other interface types such as lo and gif seems to have separate unit number namespace for each jail thus I can create those types of interfaces with the same name on multiple jails and host.
 
 ### rc.d script leaves two processes after shutdown
-This is not jail-specific.
+This is not specific to jails.
 
 When using /usr/local/etc/rc.d/wireguard rc.d script, two processes are left after running ``service wireguard stop``. They looks like processes representing monitor_daemon() in wg-quick script.
 ```
