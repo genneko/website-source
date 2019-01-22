@@ -252,7 +252,7 @@ On the WireGuard interface, plain ping packets kept flowing as if nothing happen
 Peer's endpoint was updated.
 ```
 wg show
-interface: tun0
+interface: wg0
   public key: ZnytpGElvUA1yxcdjhIqZ4L3NxZmbMJBdC9IvI5giUA=
   private key: (hidden)
   listening port: 51820
