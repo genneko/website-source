@@ -10,6 +10,8 @@ toc: true
 I used this weekend to have a quick look at it on FreeBSD 12.0.  
 This time I focused on site-to-site VPN setup. Maybe I will try remote-access VPN configuration in the near future.
 
+2019-01-23: I tested remote-access configuration between FreeBSD and Android. A quick write-up is [here] (/playing-with-bsd/networking/freebsd-wireguard-android).
+
 ## Prerequisite
 * FreeBSD 12.0/amd64
 * Generic kernel (finally with VIMAGE enabled)
