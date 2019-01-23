@@ -534,7 +534,7 @@ ipv6_gateway_enable="YES"
 ```
 
 #### Separate Network Configuration
-This is an example configuration for five VNET jails in a network separated from the host. I use this configuration to experiment network software such as VPN.
+This is an example configuration for five VNET jails in a network separated from the host. I used this configuration to experiment network software such as WireGuard VPN (see [this article](/playing-with-bsd/networking/freebsd-wireguard-quicklook)).
 
 In this configuration, one jail acts as a central router which crudely emulates a public network and is to be used as a monitoring post running tcpdump, two are routers on private sites and remaining two are hosts on the private sites.
 

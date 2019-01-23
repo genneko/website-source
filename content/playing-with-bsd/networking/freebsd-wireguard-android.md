@@ -5,7 +5,7 @@ draft: false
 tags: [ "network", "vpn", "wireguard", "freebsd", "android" ]
 toc: true
 ---
-After playing briefly with WireGuard (See [previous post](/playing-with-bsd/networking/freebsd-wireguard-quicklook)) on FreeBSD VNET Jails, today I tried to test it on a FreeBSD host and an Android device which are connected to the Internet.
+After playing briefly with WireGuard (See [previous post](/playing-with-bsd/networking/freebsd-wireguard-quicklook)) on FreeBSD VNET Jails, today I tried to test it between a FreeBSD host and an Android device over the Internet.
 
 ## Network Configuration
 * FreeBSD - WireGuard Server.  
