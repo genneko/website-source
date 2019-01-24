@@ -702,6 +702,24 @@ vpnh2 {
 }
 ```
 
+##### See Network Configuration
+The helper script can list networks (roughly equals to ng_bridges), jails, interfaces (ng_eiface) and their addresses.
+```
+$ sudo vnet list -r
+vi1
+  r1 vi1_r1 172.31.1.1/24
+  vpnr1 vi1_vpnr1 172.31.1.11/24
+vi2
+  r1 vi2_r1 172.31.2.1/24
+  vpnr2 vi2_vpnr2 172.31.2.11/24
+vri1
+  vpnh1 vri1_vpnh1 192.168.1.11/24
+  vpnr1 vri1_vpnr1 192.168.1.1/24
+vri2
+  vpnh2 vri2_vpnh2 192.168.2.11/24
+  vpnr2 vri2_vpnr2 192.168.2.1/24
+```
+
 ##### pkg without Network Connection
 Because the jails in this configuration cannot access outside network, ``pkg install`` cannot be used. Instead you can use ``pkg add`` to install the package files downloaded with ``pkg fetch``.
 

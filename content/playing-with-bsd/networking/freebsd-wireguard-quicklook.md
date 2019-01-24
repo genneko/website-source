@@ -10,6 +10,8 @@ toc: true
 I used this weekend to have a quick look at it on FreeBSD 12.0.  
 This time I focused on site-to-site VPN setup. Maybe I will try remote-access VPN configuration in the near future.
 
+_NOTE: WireGuard is still in early stage of development. Go-implementation (wireguard-go) has no official release yet. Also testing network software on VNET jails might be a bit tricky in itself. This article just shows you what I did to see what it looked like._
+
 2019-01-23: I tested remote-access configuration between FreeBSD and Android. A quick write-up is [here] (/playing-with-bsd/networking/freebsd-wireguard-android).
 
 ## Prerequisite

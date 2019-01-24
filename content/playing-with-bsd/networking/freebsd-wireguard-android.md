@@ -5,7 +5,9 @@ draft: false
 tags: [ "network", "vpn", "wireguard", "freebsd", "android" ]
 toc: true
 ---
-After playing briefly with WireGuard (See [previous post](/playing-with-bsd/networking/freebsd-wireguard-quicklook)) on FreeBSD VNET Jails, today I tried to test it between a FreeBSD host and an Android device over the Internet.
+After playing briefly with WireGuard (See [previous post](/playing-with-bsd/networking/freebsd-wireguard-quicklook)) on FreeBSD VNET Jails, today I performed a quick test between a FreeBSD host and an Android device over the Internet.
+
+_NOTE: WireGuard is still in early stage of development. Android app is clearly marked with beta and Go-implementation (wireguard-go) has no official release yet. This article just shows you what I did to take a look at it._
 
 ## Network Configuration
 * FreeBSD - WireGuard Server.  
@@ -264,7 +266,8 @@ peer: DFrE6f3TM1mVhFE8WLCgcEjCJHwfcj2T6xUt/Rzk6VY=
   transfer: 8.12 KiB received, 12.85 KiB sent
 ```
 
-Okay. Now I deleted the VPN connection on the Android phone and destroyed the droplet.
+Excellent!  
+Now I deleted the VPN connection and removed the configuration on the Android phone and destroyed the droplet.
 
 ## References
 * WireGuard  
