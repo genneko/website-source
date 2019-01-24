@@ -355,20 +355,21 @@ If you are using the version, you don't have to recompile your kernel._
 
 ### Installing and Updating FreeBSD Source
 #### From Distribution Tarball
+Download the tarball.
 ```
 cd ~/tmp
 fetch ftp://ftp.freebsd.org/pub/FreeBSD/releases/amd64/11.2-RELEASE/src.txz
 ```
 
-Update the source.
+Extract the tarball.
 ```
 sudo tar -xJvpf src.txz -C /
 ```
 
 #### From Subversion
+Check out the source.
 ```
 sudo svnlite checkout https://svn.freebsd.org/base/releng/11.2 /usr/src
-sudo svnlite update /usr/src
 ```
 
 Update the source.
