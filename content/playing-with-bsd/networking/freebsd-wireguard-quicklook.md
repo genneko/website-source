@@ -1,6 +1,7 @@
 ---
 title: "WireGuard on FreeBSD Quick Look: Testing VPN in Jail Network"
 date: 2019-01-20T15:47:34+09:00
+lastmod: 2019-01-26T14:25:00+09:00
 draft: false
 tags: [ "network", "vpn", "wireguard", "freebsd" ]
 toc: true
@@ -14,12 +15,14 @@ _NOTE: WireGuard is still in early stage of development. Go-implementation (wire
 
 2019-01-23: I tested remote-access configuration between FreeBSD and Android. A quick write-up is [here] (/playing-with-bsd/networking/freebsd-wireguard-android).
 
+2019-01-26: Added a [new section] (#remote-access-host-to-site-configuration) on testing remote-access (host-to-site) by a roaming client.
+
 ## Prerequisite
 * FreeBSD 12.0/amd64
 * Generic kernel (finally with VIMAGE enabled)
 * Bash as an login shell on the host
 
-## Network Configuration
+## Site-to-Site Configuration
 To play quickly with WireGuard, I built the following internal network made up with five VNET jails on a single FreeBSD host.
 
 * r1 (Router forwarding packets between vpnr1 and vpnr2.
@@ -61,7 +64,7 @@ I planned to run WireGuard on vpnr1 and vpnr2 and build a VPN tunnel between sit
 For details on jails configuration, please refer to [another post](/playing-with-bsd/system/learning-notes-on-jails/#separate-network-configuration).  
 The following sections assume that all five jails are up and running.
 
-## Install WireGuard
+### Install WireGuard
 Because the jails in the above configuration cannot access network outside of the host system, ``pkg install`` cannot be used to install WireGuard on them. Instead I used ``pkg add`` to install the package files downloaded with ``pkg fetch``.
 
 1. Download package files on the host.  
@@ -82,15 +85,15 @@ mount = "/var/cache/pkg /vm/${name}/mnt nullfs ro 0 0";
 ...
 ```
 
-3. Install the package on jail vpnr1 and vpnr2 from the host.  
+3. Install the package on jails from the host.  
 The filepath on the command line is the one viewed from jails not the host.
 ```
-for jail in vpnr1 vpnr2; do
+for jail in vpnr1 vpnr2 vpnh2; do
         sudo pkg -j $jail add /mnt/wireguard-0.0.20181218.txz
 done
 ```
 
-## Setup Manually
+### Setup Manually
 First I tried to manually setup WireGuard by roughly following [Quick Start](https://www.wireguard.com/quickstart/) guide on the WireGuard website.
 
 1. Create private/public key pairs.  
@@ -207,11 +210,11 @@ By "didn't work", I mean that UDP sockets were not created.
 	  allowed ips: 192.168.2.0/24, 192.168.222.2/32
 	```
 
-## Test Connectivity and Encryption
+### Test Connectivity and Encryption
 Once the configuration was done, I tested site-to-site connectivity by running ping between routers and hosts.  
 I was also monitoring packets on the intermediate router (r1) and site2 router (vpnr2) with tcpdump in order to see if the packets are encrypted.
 
-### Packets outside of the Tunnel
+#### Packets outside of the Tunnel
 Ping packets from the external address of the router on site 1 (vpnr1: 172.31.1.11) to the router on site 2 (vpnr2: 172.31.2.11) were expected to be unencrypted.  
 
 [vpnr1]
@@ -246,7 +249,7 @@ tcpdump -vln -X -i vi1_r1
 
 You can see the embedded pattern 'PLAIN' so they are not encrypted.
 
-### Packets in the Tunnel
+#### Packets in the Tunnel
 Ping packets from the host on site 1 (vpnh1) to the host on site 2 (vpnh2) were to be encapsulated/encrypted on vpnr1 and to be decapsulated/decrypted on vpnr2.
 
 [vpnh1]
@@ -338,7 +341,7 @@ tcpdump -vln -X -i vri2_vpnr2
 
 On the router on site 2 (vpnr2), the Ping packets were encapsulated/encrypted on the external interface (vi2_vpnr2) but not so on the internal interface (vri2_vpnr2).
 
-## Configure WireGuard Service with rc.d
+### Configure WireGuard Service with rc.d
 Now I know how to configure WireGuard on FreeBSD systems.  
 But to use it in the real world, I had to script the procedures in some way for automatic startup/shutdown of the tunnel.
 
@@ -379,6 +382,246 @@ To enable and start WireGuard service, run the following commands on both vpnr1 
 sysrc wireguard_enable=YES
 sysrc wireguard_interfaces="wg0"
 service wireguard start
+```
+
+## Remote Access (Host-to-Site) Configuration
+A few days later I also tried a remote access VPN configuration where the host vpnh2 connected to the router vpnr1 and its inner network (192.168.1.0/24).
+
+The router vpnr2 ran WireGuard in the previous site-to-site example, but in the modified configuration it became an ordinary router/NAT box.
+
+<pre style="line-height: 10pt"><code style="font-size: 9pt">                                 Site 1
+
+                      vri1_vpnr1      vri1_vpnh1
+       [Router(vpnr1)]o ------ (vri1br) ------ o[Host (vpnh1)]
+     vi1_vpnr1 o |    192.168.1.1   192.168.1.11
+   172.31.1.11 | o wg0
+               |  \  192.168.222.1
+            (vi1br)\
+               |    \
+   172.31.1.1  |     \
+        vi1_r1 o      \
+         [Router(r1)]  WireGuard
+        vi2_r1 o         tunnel
+   172.31.2.1  |                \
+               |                 \
+            (vi2br)               \
+               |                   \                     192.168.222.211
+   172.31.2.11 |                    \----------------o wg0
+               |                                     |
+     vi2_vpnr2 o      192.168.2.1   192.168.2.11     |
+       [Router(vpnr2)]o ------ (vri2br) ------ o[Host (vpnh2)]
+                      vri2_vpnr2      vri2_vpnh2
+
+                                 Site 2
+</code></pre>
+
+### Change Settings
+Here is a summary of changes which I made to the site-to-site configuration.
+
+1. Reconfigure vpnr2 and make it a normal NAT router.  
+[vpnr2:/etc/pf.conf]
+```
+XIF = "vi2_vpnr2"
+PRIVATENET = "192.168.2.0/24"
+nat on $XIF inet from $PRIVATENET to any -> ($XIF)
+```
+[vpnr2]
+```
+service wireguard stop
+sysrc wireguard_enable="NO"
+sudo sysrc pf_enable="YES"
+sudo service pf start
+```
+
+2. Configure WireGuard on vpnh2.  
+[vpnh2]
+```
+cd /usr/local/etc/wireguard
+wg genkey > private
+wg pubkey < private > public
+vi wg0.conf
+```
+[vpnh2:/usr/local/etc/wireguard/wg0.conf]
+	```
+	[Interface]
+	Address = 192.168.222.211/32
+	PrivateKey = content of <private>
+	
+	[Peer]
+	PublicKey = uoYkPm6lHnxF5T31lD5LB3OGM8/a4eKyUEYcJm5SXXQ=
+	AllowedIPs = 192.168.222.1/32, 192.168.1.0/24
+	Endpoint = 172.31.1.11:51820
+	```
+[vpnh2]
+```
+sysrc wireguard_enable="YES"
+sysrc wireguard_interfaces="wg0"
+service wireguard start
+```
+
+3. Reconfigure vpnr1 to accept connection from vpnh2 instead of vpnr2.  
+[vpnr1:/usr/local/etc/wireguard/wg0.conf]
+	```
+	[Interface]
+	Address = 192.168.222.1/32
+	PrivateKey = aGi8VucdQG9h9sWHV2jZT5JmAXZpyadTPJlV4BS1124=
+	ListenPort = 51820
+	
+	[Peer]
+	PublicKey = content of vpnh2's <public>
+	AllowedIPs = 192.168.222.211/32
+	```
+[vpnr1]
+```
+service wireguard stop
+service wireguard start
+```
+
+### Test and Monitor
+Let's test connectivity with ping from vpnh2 to vpnh1.
+
+1. Start tcpdump on the intermediate router r1 to monitor WireGuard packets.  
+[r1]  
+```
+tcpdump -ln -i vi1_r1
+```
+
+2. On the WireGuard client host vpnh2, start ping to the host vpnh1 (192.168.1.11) which is on the private network behind the remote VPN router vpnr1.  
+[vpnh2]
+```
+ping 192.168.1.11
+PING 192.168.1.11 (192.168.1.11): 56 data bytes
+64 bytes from 192.168.1.11: icmp_seq=0 ttl=63 time=1.669 ms
+64 bytes from 192.168.1.11: icmp_seq=1 ttl=63 time=0.903 ms
+...
+```
+
+3. Check r1's console.  
+You can see WireGuard's UDP packets between vpnr1 and vpnr2.  
+[r1]
+```
+08:08:42.810690 IP 172.31.2.11.60574 > 172.31.1.11.51820: UDP, length 128
+08:08:42.811823 IP 172.31.1.11.51820 > 172.31.2.11.60574: UDP, length 128
+08:08:43.838714 IP 172.31.2.11.60574 > 172.31.1.11.51820: UDP, length 128
+08:08:43.840446 IP 172.31.1.11.51820 > 172.31.2.11.60574: UDP, length 128
+...
+```
+Why vnpr2? Isn't it vpnh2?  
+It's because vpnh2's address (192.168.2.11) is tranlated to the external address of vpnr2 (172.31.2.11) by vpnr2's NAT function.  
+This can be confirmed by running tcpdump on vpnr2's external and internal interfaces.
+
+4. Monitor WireGuard packets on NAT box vpnr2.  
+On the internal vri2_vpnr2 interface, WireGuard packets have vpnh2's address 192.168.2.11 for its source or destination.  
+But on the external vi2_vpnr2 interface, the vpnh2's address is tranlated to vi2_vpnr2 interface's adddress.  
+[vpnr2]
+```
+tcpdump -ln -i vri2_vpnr2
+08:13:53.948608 IP 192.168.2.11.51820 > 172.31.1.11.51820: UDP, length 128
+08:13:53.949736 IP 172.31.1.11.51820 > 192.168.2.11.51820: UDP, length 128
+08:13:55.011758 IP 192.168.2.11.51820 > 172.31.1.11.51820: UDP, length 128
+08:13:55.012736 IP 172.31.1.11.51820 > 192.168.2.11.51820: UDP, length 128
+^C
+tcpdump -ln -i vi2_vpnr2
+08:14:03.258349 IP 172.31.2.11.60574 > 172.31.1.11.51820: UDP, length 128
+08:14:03.258977 IP 172.31.1.11.51820 > 172.31.2.11.60574: UDP, length 128
+08:14:04.331344 IP 172.31.2.11.60574 > 172.31.1.11.51820: UDP, length 128
+08:14:04.333282 IP 172.31.1.11.51820 > 172.31.2.11.60574: UDP, length 128
+^C
+```
+
+5. You can also see the remote VPN router vpnr1 is decrypting/decapsulating incoming packets and vise versa to outgoing packets.  
+[vpnr1]
+```
+tcpdump -ln -i vi1_vpnr1
+08:16:35.061792 IP 172.31.2.11.60574 > 172.31.1.11.51820: UDP, length 128
+08:16:35.062845 IP 172.31.1.11.51820 > 172.31.2.11.60574: UDP, length 128
+08:16:36.079824 IP 172.31.2.11.60574 > 172.31.1.11.51820: UDP, length 128
+08:16:36.080811 IP 172.31.1.11.51820 > 172.31.2.11.60574: UDP, length 128
+^C
+tcpdump -ln -i vri1_vpnr1
+08:16:43.379386 IP 192.168.222.211 > 192.168.1.11: ICMP echo request, id 64096, seq 522, length 64
+08:16:43.379533 IP 192.168.1.11 > 192.168.222.211: ICMP echo reply, id 64096, seq 522, length 64
+08:16:44.419530 IP 192.168.222.211 > 192.168.1.11: ICMP echo request, id 64096, seq 523, length 64
+08:16:44.419601 IP 192.168.1.11 > 192.168.222.211: ICMP echo reply, id 64096, seq 523, length 64
+^C
+```
+
+### What if the Host Moves
+Now that basic connectivity was confirmed, next I went one step further to see what happened if the client vpnh2 moved to other subnet.
+
+1. To quickly let vpnh2 go out and back, I made the following small shell scripts on the host.  
+[host:goout.sh]
+```
+#!/bin/sh
+ngctl rmhook vri2_vpnh2: ether
+ngctl connect vi2br: vri2_vpnh2: link2 ether
+jexec vpnh2 ifconfig vri2_vpnh2 inet 172.31.2.111/24
+jexec vpnh2 route add default 172.31.2.1
+```
+[host:goback.sh]
+```
+#!/bin/sh
+ngctl rmhook vri2_vpnh2: ether
+ngctl connect vri2br: vri2_vpnh2: link2 ether
+jexec vpnh2 ifconfig vri2_vpnh2 inet 192.168.2.11/24
+jexec vpnh2 route add default 192.168.2.1
+```
+
+2. Assume ping from vpnh2 to vpnh1 is still ongoing.  
+[vpnh2]
+```
+...
+64 bytes from 192.168.1.11: icmp_seq=1330 ttl=63 time=1.872 ms
+```
+[r1]
+```
+...
+08:30:43.318780 IP 172.31.2.11.60574 > 172.31.1.11.51820: UDP, length 128
+08:30:43.319744 IP 172.31.1.11.51820 > 172.31.2.11.60574: UDP, length 128
+```
+
+3. Move vpnh2 to 172.31.2.0/24 subnet (outside of vpnr2). Its address was changed from 192.168.2.11 to 172.31.2.111 and its packets no longer went through NAT.  
+[host]
+```
+sudo sh ./goout.sh
+```
+
+4. See what happens.  
+Source IP address of WireGuard packets were changed from 172.31.2.11 to 172.31.2.11 while vpnh2 was receiving ping responses continuously.  
+[vpnh2]
+```
+64 bytes from 192.168.1.11: icmp_seq=1331 ttl=63 time=1.908 ms
+64 bytes from 192.168.1.11: icmp_seq=1332 ttl=63 time=0.731 ms
+```
+[r1]
+```
+08:30:44.349088 IP 172.31.2.11.60574 > 172.31.1.11.51820: UDP, length 128
+08:30:44.349997 IP 172.31.1.11.51820 > 172.31.2.11.60574: UDP, length 128
+08:30:45.388243 IP 172.31.2.111.51820 > 172.31.1.11.51820: UDP, length 128
+08:30:45.388659 IP 172.31.1.11.51820 > 172.31.2.111.51820: UDP, length 128
+```
+
+5. Move vpnh2 back to the original 192.168.2.0/24 subnet (inside of vpnr2). Its address was changed back from 172.31.2.111 to 192.168.2.11 and its packets went through NAT again.  
+[host]
+```
+sudo sh ./goback.sh
+```
+
+6. See what happens once more.  
+Source of WireGuard packets were changed back to 172.31.2.11 but ping continued to be received responses on vpnh2.  
+[vpnh2]
+```
+64 bytes from 192.168.1.11: icmp_seq=1333 ttl=63 time=1.281 ms
+64 bytes from 192.168.1.11: icmp_seq=1334 ttl=63 time=1.772 ms
+...
+```
+[r1]
+```
+08:30:46.419636 IP 172.31.2.111.51820 > 172.31.1.11.51820: UDP, length 128
+08:30:46.420342 IP 172.31.1.11.51820 > 172.31.2.111.51820: UDP, length 128
+08:30:47.449488 IP 172.31.2.11.60574 > 172.31.1.11.51820: UDP, length 128
+08:30:47.450383 IP 172.31.1.11.51820 > 172.31.2.11.60574: UDP, length 128
+...
 ```
 
 ## Caveats
@@ -452,3 +695,4 @@ I guess this can be fixed by adding code for shutting down the processes by thei
 
 ## Revision History
 * 2019-01-20: Created
+* 2019-01-26: Added "Remote Access (Host-to-Site) Configuration"
