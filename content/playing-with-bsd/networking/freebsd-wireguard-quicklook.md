@@ -415,6 +415,8 @@ The router vpnr2 ran WireGuard in the previous site-to-site example, but in the 
                                  Site 2
 </code></pre>
 
+NOTE: I also tested remote-access configuration using the WireGuard Android app. See [this article] (/playing-with-bsd/networking/freebsd-wireguard-android) on this.
+
 ### Change Settings
 Here is a summary of changes which I made to the site-to-site configuration.
 
