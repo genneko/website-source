@@ -431,8 +431,8 @@ nat on $XIF inet from $PRIVATENET to any -> ($XIF)
 ```
 service wireguard stop
 sysrc wireguard_enable="NO"
-sudo sysrc pf_enable="YES"
-sudo service pf start
+sysrc pf_enable="YES"
+service pf start
 ```
 
 2. Configure WireGuard on vpnh2.  
