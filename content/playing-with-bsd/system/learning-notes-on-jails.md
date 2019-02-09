@@ -39,7 +39,7 @@ Here I'm going to create a FreeBSD 11.2 template in /vm/tmpl/11.2.
 
 	```
 	cd ~/tmp
-	fetch ftp:/ftp.freebsd.org/pub/FreeBSD/releases/amd64/11.2-RELEASE/base.txz
+	fetch ftp://ftp.freebsd.org/pub/FreeBSD/releases/amd64/11.2-RELEASE/base.txz
 	```
 
 3. Extract the base tarball in the template directory.
