@@ -638,6 +638,10 @@ ifconfig wg0 destroy
 ifconfig: SIOCIFDESTROY: Invalid argument
 ```
 
+_2019-02-13:  
+I reported this issue on FreeBSD Bugzilla. It's the first bug report to any OSS in my life! To be honest, it was a bit scary for a non-developer like me to submit a report about high-quality software like FreeBSD. But anyway it is now in the database._
+<https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=235704>
+
 I found that renaming the interface from wgX to tunX lets you destroy it but this operation sometimes caused reboot on my system.
 ```
 ifconfig wg0 name tun0
