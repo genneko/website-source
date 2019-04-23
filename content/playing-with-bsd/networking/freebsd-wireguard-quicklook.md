@@ -1,7 +1,7 @@
 ---
 title: "WireGuard on FreeBSD Quick Look: Testing VPN in Jail Network"
 date: 2019-01-20T15:47:34+09:00
-lastmod: 2019-01-26T14:25:00+09:00
+lastmod: 2019-04-23T23:14:00+09:00
 draft: false
 tags: [ "network", "vpn", "wireguard", "freebsd" ]
 toc: true
@@ -628,7 +628,14 @@ Source of WireGuard packets were changed back to 172.31.2.11 but ping continued 
 
 ## Caveats
 
-### On VNET Jails, wgX cannot be destroyed
+### On VNET Jails, wgX cannot be destroyed (Fixed)
+_2019-02-13:  
+I reported this issue on FreeBSD Bugzilla. It's the first bug report to any OSS in my life! To be honest, it was a bit scary for a non-developer like me to submit a report about high-quality software like FreeBSD. But anyway it is now in the database._
+<https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=235704>
+
+_2019-04-23:  
+This issue was fixed in March and MFC to 12-STABLE and 11-STABLE._
+
 This is true for both manual and rc.d setup but not the case in non-Jail environment.  
 Because of this, ``service wireguard stop`` in a jail gets stuck when it waits for the interface to be destroyed.
 
@@ -637,10 +644,6 @@ Manually running ``ifconfig wg0 destroy`` fails with the following message.
 ifconfig wg0 destroy
 ifconfig: SIOCIFDESTROY: Invalid argument
 ```
-
-_2019-02-13:  
-I reported this issue on FreeBSD Bugzilla. It's the first bug report to any OSS in my life! To be honest, it was a bit scary for a non-developer like me to submit a report about high-quality software like FreeBSD. But anyway it is now in the database._
-<https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=235704>
 
 I found that renaming the interface from wgX to tunX lets you destroy it but this operation sometimes caused reboot on my system.
 ```
@@ -676,6 +679,13 @@ tun2
 
 I wonder if it means that if_tun's unit number is assigned sequentially across all jails and host?  
 As far as I know, other interface types such as lo and gif seems to have separate unit number namespace for each jail thus I can create those types of interfaces with the same name on multiple jails and host.
+
+### Kernel panics on shutdown (Worked Around)
+_2019-04-23:  
+Workaround was implemented in WireGuard mainstream and FreeBSD ports of wireguard and wireguard-go were also updated.  
+Occasional hang of "wg-quick down" was also worked around._  
+<https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=233955>
+
 
 ### rc.d script leaves two processes after shutdown
 This is not specific to jails.
