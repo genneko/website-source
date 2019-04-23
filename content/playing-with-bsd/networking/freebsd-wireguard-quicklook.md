@@ -1,7 +1,7 @@
 ---
 title: "WireGuard on FreeBSD Quick Look: Testing VPN in Jail Network"
 date: 2019-01-20T15:47:34+09:00
-lastmod: 2019-04-23T23:14:00+09:00
+lastmod: 2019-04-24T06:29:00+09:00
 draft: false
 tags: [ "network", "vpn", "wireguard", "freebsd" ]
 toc: true
@@ -683,9 +683,14 @@ As far as I know, other interface types such as lo and gif seems to have separat
 ### Kernel panics on shutdown (Worked Around)
 _2019-04-23:  
 Workaround was implemented in WireGuard mainstream and FreeBSD ports of wireguard and wireguard-go were also updated.  
-Occasional hang of "wg-quick down" was also worked around._  
+Occasional hang of "wg-quick down" was also worked around.  
+I tested the workarounds and didn't see any panic nor process hang during 50000 restarts._  
 <https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=233955>
 
+_2019-04-24:  
+Kernel fixes also came in! One is already committed to head and the other is being reviewed._
+
+There are reports that shutting down WireGuard tunnel interface causes a kernel panic. I also noticed that "wg-quick down" process occasionally hangs when it waits for the interface to be removed. Those issues seem to be in the kernel and WireGuard only hits them.
 
 ### rc.d script leaves two processes after shutdown
 This is not specific to jails.
