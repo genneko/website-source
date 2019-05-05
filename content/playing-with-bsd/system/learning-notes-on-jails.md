@@ -1,7 +1,7 @@
 ---
 title: "Learning Notes on FreeBSD Jails"
 date: 2018-10-07T18:35:49+09:00
-lastmod: 2019-01-19T19:48:00+09:00
+lastmod: 2019-05-05T18:00:00+09:00
 draft: false
 tags: [ "freebsd", "jail", "virtualization", "administration" ]
 toc: true
@@ -781,6 +781,12 @@ https://mwl.io/nonfiction/os#fmaz
 
 * FreeBSD Mastery: Specialty Filesystems by Michael W. Lucas  
 https://mwl.io/nonfiction/os#fmsf
+
+* Absolute FreeBSD, 3rd Edition by Michael W. Lucas  
+https://mwl.io/nonfiction/os#af3e
+
+* FreeBSD Mastery: Jails by Michael W. Lucas  
+https://mwl.io/nonfiction/os#fmjail
 
 * GitHub: genneko/freebsd-vimage-jails  
 https://github.com/genneko/freebsd-vimage-jails
