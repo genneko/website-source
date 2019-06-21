@@ -15,7 +15,7 @@ Since then, the number of notes has grown up to around 20000 and without doubt, 
 There might be something wrong with the recent update of Android app. It suddenly became draggingly slow and began draining battery all the time. My phone got unusually hot, so I had no other choice than to uninstall it and start looking for alternatives.
 
 To be clear, the app for Windows and Web continue to work fine.  
-But as my daily usecase of Evernote is as follows along with the fact that "Evernote for Web" cannot be used on Android browsers, I effectively lost access to my notes on mobile environemnts. That's a really huge problem.
+But as my daily usecase of Evernote is as follows along with the fact that "Evernote for Web" cannot be used on Android browsers, I effectively lost access to my notes on mobile environments. That's a really huge problem.
 
 - On PCs
   - using "Evernote for Web" to view/add/edit (usually long) notes and clip web pages  
@@ -191,7 +191,7 @@ So please refer to [the section](#build-the-app-from-source) and replace the ste
 ```
 git clone https://github.com/genneko/joplin.git
 cd joplin
-git checkout -b headless-proxy origin/headless_proxy
+git checkout -b headless_proxy origin/headless_proxy
 ```
 
 This custom terminal app can be run the same as the original one.
