@@ -1,6 +1,7 @@
 ---
-title: "Using Joplin Terminal Application and Web Clipper on FreeBSD"
+title: "Using Joplin (Terminal and Desktop) and Web Clipper on FreeBSD"
 date: 2019-06-21T23:20:00+09:00
+lastmod: 2019-06-23T16:55:00+09:00
 draft: false
 tags: [ "application", "nodejs", "installation", "freebsd" ]
 toc: true
@@ -43,6 +44,9 @@ According to the [Joplin website](https://joplinapp.org#installation), three typ
 
 At first glance, none of them seem to support FreeBSD.  
 Building the Electron-based desktop app on FreeBSD looks very hard to me, though I recently heard about the progress of Electron on FreeBSD.  
+
+_2019-06-23: I added a [new section] (#desktop-application) on running the desktop app on FreeBSD!_
+
 On the other hand, the terminal app seems to have at least minimal support for FreeBSD as the [issue #867](https://github.com/laurent22/joplin/issues/867) indicates, so I decided to start with the terminal app.
 
 There are also the following add-on and third-party tools.
@@ -127,18 +131,15 @@ Basically, you can follow the steps described in ["Linux and Windows (WSL) depen
 
 1. Install dependencies.  
 pkgconf and vips are required for installing node-gyp.  
-Yarn is also required to build the app.
+Joplin website says that Yarn is also required but it doesn't seem to apply to the terminal app.
     ```
     sudo pkg install node8 npm-node8 pkgconf vips
     sudo npm install -g node-gyp
-    cd ~/tmp/or/somewhre
-    fetch https://yarnpkg.com/install.sh
-    less install.sh
-    sh ./install.sh
     ```
 
 2. Get (clone) the source from GitHub.  
     ```
+    cd ~/tmp/or/somewhere
     git clone https://github.com/laurent22/joplin.git
     ```
 
@@ -213,6 +214,75 @@ joplin server start
 
 Now I can use Web Clipper extension on FreeBSD!
 ![Web Clipper runs on FreeBSD](/images/joplin-on-freebsd/webclipper-on-freebsd.png)
+
+## Desktop Application
+After successfully building the terminal app, I realized that Electron was added to FreeBSD ports tree as devel/electron4 last month. So finally, I tried to run the Electron-based desktop application on FreeBSD with it.
+
+Because I'm not familiar with Electron at all, the following steps are just what I did to run the app and they might not be the right way. But I wrote them as a record anyway.
+
+
+1. Configure pkg to use the latest package set.
+
+    This change is required because the default "quarterly" set didn't have devel/electron4 yet.  
+    It was achieved by creating an overriding repository configuration file FreeBSD.conf in /usr/local/etc/pkg/repo and recreating the repository catalog as follows.
+
+    ```
+    sudo mkdir -p /usr/local/etc/pkg/repo
+    echo 'FreeBSD: { url: "pkg+http://pkg.FreeBSD.org/${ABI}/latest" }' > /usr/local/etc/pkg/repo/FreeBSD.conf
+    sudo pkg update -f
+    ```
+
+    _I first tried to build devel/electron4 from port, but unfortunately my FreeBSD VM seemed to crash with the host (I was not there when the crash happened. I only saw the host OS had been restarted) at the late stage of hours of build process. So I decided to go with pre-built package in the latest package set._
+
+2. Install electron4 package and its dependencies.
+
+    ```
+    sudo pkg install electron4
+    ```
+
+3. Install Joplin's dependencies.  
+pkgconf and vips are required for installing node-gyp.  
+    ```
+    sudo pkg install node8 npm-node8 pkgconf vips
+    sudo npm install -g node-gyp
+    ```
+
+4. Get (clone) the source from GitHub.  
+    ```
+    cd ~/tmp/or/somewhere
+    git clone https://github.com/laurent22/joplin.git
+    ```
+
+5. Build the tools.  
+    ```
+    cd joplin/Tools
+    npm install
+    ```
+
+6. Before building the Electron app, I had to make small modifications to at least two files.  
+They might be wrong ways but anyway here's [a patch](https://gist.githubusercontent.com/genneko/fbd6420404caf5d518563bb056cf46ed/raw/75183ecdea088152fc2bb0dfceb8a6096dc5a427/patch-joplin-electron-freebsd.txt) to apply as follows.
+    ```
+    cd ..
+    patch < ~/tmp/patch-joplin-electron-freebsd.txt
+    ```
+
+7. Build the Electron app by mostly following the [build instruction](https://github.com/laurent22/joplin/blob/master/BUILD.md#building-the-electron-application).  
+I omitted a packaging part.
+
+    ```
+    cd ElectronClient/app
+    rsync --delete -a ../../ReactNativeClient/lib/ lib/
+    npm install
+    ```
+
+8. Run the desktop app.
+
+    ```
+    electron .
+    ```
+
+9. Yay! Many thanks to folks around the devel/electron4 port!
+![Electron Desktop App on FreeBSD](/images/joplin-on-freebsd/joplin-desktop-app.png)
 
 ## Joplin Web
 Because I've been mainly using Evernote on its Web application, it is really nice to have a web UI for Joplin too.
@@ -348,6 +418,13 @@ This makes me dream of writing a small web frontend with Mojolicious or some kin
 * GitHub: sciurius/perl-Joplin-API  
 <https://github.com/sciurius/perl-Joplin-API>
 
+* FreeBSD Forum: Electron for FreeBSD
+<https://forums.freebsd.org/threads/electron-for-freebsd.64103/>
+
+* FreshPorts: devel/electron4
+<https://www.freshports.org/devel/electron4/>
+
 ## Revision History
 * 2019-06-21: Created
+* 2019-06-23: Added "Desktop Application" and changed the article title
 
