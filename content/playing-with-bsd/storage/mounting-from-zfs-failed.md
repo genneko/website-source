@@ -181,7 +181,7 @@ zpool labelclear -f da4p2
 zpool labelclear -f da4p3
 ```
 
-It took quite some time (almost a week) for me to solve this problem, but this was really a good learning experience!
+It took quite some time (almost a week) for me to reach here, but this was really a good learning experience!
 
 ## References
 * FreeBSD Manual: zpool(8)  
