@@ -29,7 +29,7 @@ canonifyurls = true
 
   topimage = "/images/forest.jpg"
   headericon = "/images/genneko-icon.png"
-  toparticlemax = 10
+  toparticlemax = 20
 
 # This is displayer in About page.
 [params.author]

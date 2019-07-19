@@ -1,7 +1,7 @@
 ---
 title: "Mounting ZFS Root failed when an external USB drive is connected"
 date: 2019-07-18T19:08:00+09:00
-draft: true
+draft: false
 tags: [ "storage", "zfs", "usb", "ufs", "freebsd" ]
 toc: true
 ---
@@ -12,7 +12,7 @@ Mounting from zfs:zroot/ROOT/default failed with error 6; retrying for 3 more se
 
 It was the first time I encountered this type of error.
 
-After struggling for some time, I was able to boot the server by disconnecting an external USB harddrive, which I had prepared as a secondary backup storage.
+After struggling for some hours, I was able to boot the server by disconnecting an external USB harddrive, which I had prepared as a secondary backup storage.
 But since then, I had been wondering what the root cause was.
 
 And today, I've finally found that the USB harddrive had ZFS label information in its UFS partition.  
@@ -31,7 +31,7 @@ Once it was detected as da4, I ran ``gpart show`` and confirmed there was only a
     ```
 
 2. Next I checked if there's any ZFS pool available for import.  
-I did this because similar problems were reported on the web and they seem to have something to do with a ZFS pool on USB storage.  
+I did this because similar problems were reported on the web and they seem to have something to do with ZFS pools on USB storage.  
 Oh wait! Another zroot? Where does it come from?   
     ```
     $ sudo zpool import
@@ -51,9 +51,9 @@ Oh wait! Another zroot? Where does it come from?
     	    15874716908755608597  UNAVAIL  corrupted data
     ```
 
-3. The previous command doesn't tell me where the pool is.  
-So I disconnect the disk and ran ``zpool import`` again.  
-This time it didn't show any pool. Thus the pool must be on the disk (da4).
+3. The previous command doesn't tell me where the pool resides.  
+I disconnect the USB disk and ran ``zpool import`` again.  
+This time it didn't show any pool. So the pool must be on the disk (da4).
 ```
 $ sudo zpool import
 ```
@@ -80,7 +80,8 @@ First, I ran the command on the whole disk (/dev/da4) but no label was found.
     failed to unpack label 3
     ```
 
-5. Next, I ran it on the UFS partition (/dev/da4p1). Bingo!
+5. Next, I ran it on the UFS partition (/dev/da4p1).  
+Bingo! It looks like one of the four ZFS labels is still there even after the partition was reformatted in UFS.
     ```
     $ sudo zdb -l /dev/da4p1
     ------------------------------------
@@ -139,18 +140,21 @@ First, I ran the command on the whole disk (/dev/da4) but no label was found.
     failed to unpack label 3
     ```
 
-6. I cleared the label with ``zpool labelclear`` on the partition and confirmed ``zpool import`` didn't list the pool any more.
+6. I cleared the label with ``zpool labelclear`` on the partition after I took a backup of its contents and confirmed ``zpool import`` didn't list the pool any more.
     ```
+    $ sudo mount /dev/da4p1 /mnt
+    (backup data in /mnt to somewhere)
+    $ sudo umount /mnt
     $ sudo zpool labelclear -f /dev/da4p1
     $ sudo zpool import
     ```
-**NOTE**: ``zpool labelclear`` destroys the UFS filesystem. Make sure to backup your data first.
+**NOTE**: ``zpool labelclear`` on a partition might destroy the filesystem on it. Make sure to backup your data first.
 
 ## What Made This Weird UFS partition with ZFS label
 Okay. I will see if it finally and completely solves the problem on the next reboot.  
 By the way, why did this happen?
 
-I found my note on how the USB disk was reused as a secondary backup device on the server.  
+I found my note on how I reused the USB disk as a secondary backup device on the server.  
 It goes like this.
 ```
 # Re-create GPT.
@@ -162,14 +166,14 @@ sudo newfs -S 4096 /dev/da4p1
 ```
 
 The disk was apparently being used for a ZFS mirrored pool on other system.  
-The poolname 'zroot' indicates it was the standard ZFS root disk layout with 3 partitions of type freebsd-boot, freebsd-swap and freebsd-zfs (or 2 partitions of freebsd-boot and freebsd-zfs).  
+The poolname 'zroot' indicates it has a standard ZFS root disk layout with 3 partitions of type freebsd-boot, freebsd-swap and freebsd-zfs, or 2 partitions of freebsd-boot and freebsd-zfs.  
 The pool might be in a ZFS partition at the end of the disk and the partitions might be aligned with 1M boundary.
 
-If my guesses are correct, the end of the UFS partition was on the same place as the ZFS partition which it replaced.  
-There's no wonder if one of four ZFS labels were intact after being reused as a UFS partition.
+If my guesses are correct, the end of the UFS partition is on the same place as the former ZFS partition which it replaced.  
+So there's no wonder if one of four ZFS labels were intact after being reused as a UFS partition.
 
 ## Lesson Learned
-Before reusing a disk, run ``zpool labelclear`` on a whole disk and each partition.
+Before reusing a disk on FreeBSD systems, run ``zpool labelclear`` on a whole disk and each partition.
 ```
 zpool labelclear -f da4
 zpool labelclear -f da4p1
@@ -177,5 +181,18 @@ zpool labelclear -f da4p2
 zpool labelclear -f da4p3
 ```
 
-It took some time but this was really a good learning experience!
+It took quite some time (almost a week) for me to solve this problem, but this was really a good learning experience!
+
+## References
+* FreeBSD Manual: zpool(8)  
+<https://www.freebsd.org/cgi/man.cgi?zpool(8)>
+
+* FreeBSD Manual: zdb(8)  
+<https://www.freebsd.org/cgi/man.cgi?zdb(8)>
+
+* iXsystems Community: Upgraded 8.0.4 to 8.3 - now have a zpool with a duplicate name  
+<https://www.ixsystems.com/community/threads/upgraded-8-0-4-to-8-3-now-have-a-zpool-with-a-duplicate-name.10831/>
+
+* FreeBSD Forum: Solved - Failed to boot when connect a external usb zpool  
+<https://forums.freebsd.org/threads/failed-to-boot-when-connect-a-external-usb-zpool.56622/>
 
