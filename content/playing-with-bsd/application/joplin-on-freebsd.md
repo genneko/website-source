@@ -1,7 +1,7 @@
 ---
 title: "Using Joplin (Terminal and Desktop) and Web Clipper on FreeBSD"
 date: 2019-06-21T23:20:00+09:00
-lastmod: 2019-06-23T16:55:00+09:00
+lastmod: 2019-07-28T06:52:00+09:00
 draft: false
 tags: [ "application", "nodejs", "installation", "freebsd" ]
 toc: true
@@ -224,11 +224,11 @@ Because I'm not familiar with Electron at all, the following steps are just what
 1. Configure pkg to use the latest package set.
 
     This change is required because the default "quarterly" set didn't have devel/electron4 yet.  
-    It was achieved by creating an overriding repository configuration file FreeBSD.conf in /usr/local/etc/pkg/repo and recreating the repository catalog as follows.
+    It was achieved by creating an overriding repository configuration file FreeBSD.conf in /usr/local/etc/pkg/repos and recreating the repository catalog as follows.
 
     ```
-    sudo mkdir -p /usr/local/etc/pkg/repo
-    echo 'FreeBSD: { url: "pkg+http://pkg.FreeBSD.org/${ABI}/latest" }' > /usr/local/etc/pkg/repo/FreeBSD.conf
+    sudo mkdir -p /usr/local/etc/pkg/repos
+    echo 'FreeBSD: { url: "pkg+http://pkg.FreeBSD.org/${ABI}/latest" }' > /usr/local/etc/pkg/repos/FreeBSD.conf
     sudo pkg update -f
     ```
 
@@ -427,4 +427,4 @@ This makes me dream of writing a small web frontend with Mojolicious or some kin
 ## Revision History
 * 2019-06-21: Created
 * 2019-06-23: Added "Desktop Application" and changed the article title
-
+* 2019-07-28: Corrected wrong paths for custom pkg config file
