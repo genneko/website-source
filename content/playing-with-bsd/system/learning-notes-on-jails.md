@@ -341,7 +341,7 @@ Sometimes I feel that jails networking is not always intuitive.
 
 In my current understanding, a standard (non-VNET) jail shares its IP address with the host.  
 If the jail doesn't listen to a specific TCP or UDP port on the address, packets destined to the port/address are processed by the host.  
-A jail's address is usually an IP alias (secondary address) on the host but it's not limited to that. Actually a jail can use the host's primary IP address unless the host and the jail doesn't use the same ports.  
+A jail's address is usually an IP alias (secondary address) on the host but it's not limited to that. Actually a jail can use the host's primary IP address unless the host and the jail do not use the same ports.  
 I think this behavior is confusing because I expect that the host and jails can be viewed as spearate systems.
 
 It's also hard to understand at first that jail's 127.0.0.1 is mapped to an address deligated to the jail, inter-jail communications go through lo0 even if jails' addresses are assigned to lo1 and so on.
