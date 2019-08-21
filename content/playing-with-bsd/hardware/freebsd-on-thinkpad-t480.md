@@ -281,7 +281,7 @@ sudo service cupsd start
 -  xfce4-print package doesn't seem to support CUPS (only supports LPD).
 
 ### Pulling From OneDrive
-- I use OneDrive to import photos taken by smartphones. OneDrive Free Client allows me to achieve this on FreeBSD machine.
+- On the previous main PC (Windows 10), I used OneDrive to import photos taken by smartphones. OneDrive Free Client allows me to achieve this on FreeBSD machine.
 ```
 sudo zfs create -o mountpoint=/data zroot/data
 sudo zfs create -o recordsize=1M zroot/data/OneDrive
