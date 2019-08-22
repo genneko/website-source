@@ -1,7 +1,7 @@
 ---
 title: "ThinkPad T480 is my new main laptop which runs FreeBSD"
 date: 2019-08-22T00:50:00+09:00
-draft: true
+draft: false
 tags: [ "laptop", "desktop", "xorg", "installation", "freebsd" ]
 toc: true
 ---
@@ -14,21 +14,23 @@ Actually, I have been pretty happy with any client OS as long as I could use a d
 
 However, it's also true that I have been wishing for a FreeBSD desktop which allows me to do everything from web browsing to text editing on a single machine.
 
-So I started a reseach on FreeBSD laptops in the midst of this year's longer-than-usual rainy season. After gathering information on the web, I tried various GUI setup on VMs and then I bought a new laptop, Lenovo ThinkPad T480.
+So I started a research on FreeBSD laptops in the midst of this year's longer-than-usual rainy season. After gathering information on the web, I tried various GUI setup on VMs and then I bought a new laptop, Lenovo ThinkPad T480.
 
-Experimenting a bit more on the T480, finally I've got a fully working FreeBSD laptop for daily use, just after the rainy season was over!
+Experimenting for a while on the T480, finally I've got a fully working FreeBSD laptop for daily use, just after the rainy season was over!
 
-Because it proved to be a really great machine for running FreeBSD, I wrote this article to share my experience with anyone who looks for a similar one.
+Because it has proven to be a really great machine for running FreeBSD, I write this article to share something with anyone who looks for a similar experience.
+
+![T480 FreeBSD Workstation](/images/freebsd-on-thinkpad-t480/T480_FreeBSD_And_Cat.jpg)
 
 ## Laptop Specs
-Generally speaking, I love small machines with lower power consumption. But this time, my goal is replacing my main desktop (running Windows) with a new laptop, so I invested on performance much more than usual.
+Generally speaking, I love small machines with low power consumption. But this time, my goal is replacing my main desktop (running Windows) with a new laptop, so I invested on performance much more than usual.
 
 - CPU: Core i7-8550U 1.8GHz (Boosted to 4.0GHz) (4 cores/8 threads, TDP 15W)
 - RAM: 32GB (16GBx2) DDR4 2400MHz SODIMM
-- Storage: SAMSUNG 860 EVO 1.0TB SATA SSD
+- Storage: SAMSUNG 860 EVO 1.0TB SATA SSD  
   (originally the laptop came with a SEAGATE STL1000LM035 1.0TB (5400rpm) SATA)
 - VGA: Integrated Intel UHD Graphics 620
-- Ethernet: Onboard 1000BASE-T
+- Ethernet: Intel Ethernet Connection I219-V (Onboard 1000BASE-T)
 - WiFi: Intel Dual Band Wireless-AC 8265 (2x2 AC) + BT 4.1
 - No Fingerprint and Smartcard readers
 
@@ -38,7 +40,7 @@ With FreeBSD 12.0-RELEASE + Xorg + XFCE4, I can get the following stuff working 
 - Ethernet and WiFi work, although WiFi is a bit slow (only up to 802.11a?) compared to 802.11n/802.11ac capable OSes.
 - Xorg works fine in full resolution (1920x1080) with i915kms.ko.
 - Suspend/resume works almost fine as the same level as Windows (they sometimes get weird anyway).
-- Sound output works.
+- Sound output works on both speaker and headphones.
 - Microphone seems to work on Audacity and Google Hangouts.
 - Mute button works. Volume buttons do not work but you can adjust volume with UI.
 - LCD Brightness buttons work.
@@ -57,7 +59,7 @@ I haven't tested the following items.
 - Bluetooth (disabled in BIOS to avoid hang on reboot)
 
 ## Initial Setup
-### Disable Secure Boot, TPM and Bluetooth in BIOS Menu
+### Disable Secure Boot, TPM and Bluetooth
 To boot T480 from FreeBSD installation media, I had to enter the BIOS menu and disable Secure Boot and TPM.  
 It is also required to disable Bluetooth to avoid hangup on system reboot.  
 <https://wiki.freebsd.org/Laptops/Thinkpad_X270>
@@ -85,7 +87,7 @@ At first, I selected the following FreeBSD versions as candidates.
 - FreeBSD 12-STABLE
 - FreeBSD 11.3-RELEASE
 
-With experts' advices on Twitter and experiments on actual machine with installation media and RAM disk, I chose 12.0-RELEASE to start with. Now it turns out to be the right choice based on the right advices.
+With experts' advices on Twitter and experiments on actual machine with installation media and RAM disk (Maybe on another post), I chose 12.0-RELEASE to start with. Now it turns out to be the right choice based on the right advices.
 
 ### OS Installation
 There's almost nothing special about installation. But here's a few things to note.
@@ -144,14 +146,17 @@ Anyway, I use the following components to build my desktop.
 - SLiM - Login Manager
 - Xfce - Desktop Environment
 
-Plus, here is the list of applications for my daily use.
+Plus, here is the list of graphical applications for my daily use.
 
-- Xfce4-Terminal - Terminal
+- Xfce4-Terminal - Terminal Emulator
 - Firefox, Chromium - Web Browser
-- Thunderbird - Mail Client
-- Rhythmbox - Jukebox
-- Audacity - Sound Editor
+- Thunderbird - Email Client
 - Joplin - Note Taking Application (Evernote Alternative)
+- Rhythmbox - Jukebox
+- VLC media player - Media Player
+- GIMP - Image Editor
+- Audacity - Audio Editor
+- HandBrake - Video Transcoder
 - Picasa3 (Windows Application) - Picture Organizer which runs on WINE.
 
 Setup process was as follows.
@@ -165,7 +170,7 @@ shutdown -r now
 
 - Install Xorg and releated packages.
 ```
-sudo pkg install xorg xfce xfce4-goodies slim slim-themes firefox thunderbird chromium
+sudo pkg install xorg xfce xfce4-goodies slim slim-themes
 ```
 
 - Install local language stuff
@@ -216,16 +221,16 @@ sudo service avahi-dnsconfd start
 sudo service slim start
 ```
 
-## Personal Tips for Customization
-### Shorter Boot Time
-- Add the following line to /boot/loader.conf
+- Install applications.
 ```
-autoboot_delay="2"
+sudo pkg install firefox thunderbird chromium ...
 ```
 
-### Trackpoint and Touchpad
-- Disable touchpad and enable "Virtual Scrolling" with the middle button.  
+## Personal Notes on Further Setup
+### Touchpad and TrackPoint
 <https://ben-rowan.github.io/post/disable_lenovo_trackpad/>  
+
+- As I use a wireless mouse (Logicool's Unifying one) most of the time, I disabled touchpad and enabled "Virtual Scrolling" with the TrackPoing and the middle button instead.  
 [/boot/loader.conf]  
 ```
 hw.psm.synaptics_support="1"
@@ -240,7 +245,8 @@ moused_flags="-V"
 ```
 
 ### Screen Brightness
-- The following configurations along with XFCE4's Power Management allows me to automatically change brightness upon change of the power source (AC or battery).  
+- XFCE4 Power Manager's Brightness Control sometimes shows weird behavior. When I switch the power between AC and battery, screen brightness initially changes as configured but gets back to the previous level when I move mouse cursor.  
+After struggling for a while, I found the following configurations with the XFCE4's brightness adjustment disabled allow me to automatically adjust brightness upon change of the power source (AC or battery).  
 [/boot/loader.conf]
 ```
 acpi_video_load="YES"
@@ -251,26 +257,13 @@ hw.acpi.video.lcd0.economy=30
 hw.acpi.video.lcd0.fullpower=60
 ```
 
-### SLiM
-- Edit /usr/local/etc/slim.conf
-```
-default_user genneko
-current_theme lake
-```
-
-### Audacity
-- To export MP3, install lame from ports. Audacity itself can be installed via binary package.
-
-### Joplin
-- See [this article](/playing-with-bsd/application/joplin-on-freebsd).
-
 ### Beep on Logout
 - When unmute, opening the logout dialog makes a loud beep. I added the following line to ~/.xinitrc to avoid it.
 ```
 xset -b
 ```
 
-### Printing to EPSON Ink-Jet Printer EP-802A
+### EPSON Ink-Jet Printer EP-802A
 - Install and configure CUPS as follows. Then point your web browser to localhost:631 and configure the printer.
 ```
 sudo pkg install gutenprint
@@ -280,21 +273,31 @@ sudo service cupsd start
 
 -  xfce4-print package doesn't seem to support CUPS (only supports LPD).
 
-### Pulling From OneDrive
-- On the previous main PC (Windows 10), I used OneDrive to import photos taken by smartphones. OneDrive Free Client allows me to achieve this on FreeBSD machine.
+### Audacity
+- To export MP3, install lame from ports.  
+Audacity itself can be installed via binary package.
+
+### Joplin
+<https://joplinapp.org/>
+
+- See [this article](/playing-with-bsd/application/joplin-on-freebsd).
+
+### OneDrive
+<https://skilion.github.io/onedrive/>
+
+- On the previous main PC (Windows 10), I used OneDrive to import photos taken and uploaded by smartphones. 
+OneDrive Free Client allows me to achieve this on FreeBSD machine.
 ```
-sudo zfs create -o mountpoint=/data zroot/data
-sudo zfs create -o recordsize=1M zroot/data/OneDrive
-sudo chown genneko:genneko /data/OneDrive
 sudo pkg install onedrive
+
 onedrive
 # Open the URL shown and sign in with your Microsoft account.  
 # When you see a blank page after granting access to "OneDrive Free Client", enter the blank page's URL on the command-line prompt.
-cat > .config/onedrive/config 
-sync_dir = "/data/OneDrive"
-^D
+
 # Test it now.
+# ~/OneDrive is the default sync_dir.
 onedrive --download-only --dry-run --synchronize
+
 # Real Run.
 onedrive --download-only --synchronize
 ```
@@ -332,34 +335,33 @@ Maybe in another post.
 
 * FreeBSD Desktop  
 <https://vermaden.wordpress.com/freebsd-desktop/>  
+
+* Getting Started With drm-kmod  
 <https://freebsddesktop.github.io/2018/12/08/drm-kmod-primer.html>  
-<https://en.wikipedia.org/wiki/Direct_Rendering_Manager>
 
-* UEFI bcdedit  
-<https://msll.hatenablog.com/entry/20171020/1508514811>  
-<https://forums.freebsd.org/threads/10-3-uefi-multiboot.56065/>
-
-* FreeBSD Suspend/Resume (How to test, etc.)  
+* FreeBSD wiki: Suspend/Resume  
 <https://wiki.freebsd.org/SuspendResume>
 
-* WiFi  
+* FreeBSD Handbook: Wireless Networking  
 <https://www.freebsd.org/doc/handbook/network-wireless.html>  
+
+* FreeBSD Wireless Quickstart  
 <http://srobb.net/fbsdquickwireless.html>
 
-* Touchpad  
+* FreeBSD wiki: Synaptics Touchpad  
 <https://wiki.freebsd.org/SynapticsTouchpad>
 
-* Two-finger Scroll  
+* FreeBSD Forum & Bugzilla: Two-finger Scroll  
 <https://forums.freebsd.org/threads/touchpad-envy.58739/>  
 <https://bugs.freebsd.org/bugzilla/show_bug.cgi?id=228875>  
 <https://forums.freebsd.org/threads/synaptics-two-finger-scroll.53720/>
 
-* Disable Touchpad and Enable Virtual Scrolling  
+* FreeBSD: Disable Your Lenovo Trackpad  
 <https://ben-rowan.github.io/post/disable_lenovo_trackpad/>
 
-* Disable Touchpad Tap As a Click  
+* FreeBSD Forum: How to disable mousepad tapping ?  
 <https://forums.freebsd.org/threads/how-to-disable-mousepad-tapping.17370/>
 
 ## Revision History
-* 2019-08-21: Created
+* 2019-08-22: Created
 
