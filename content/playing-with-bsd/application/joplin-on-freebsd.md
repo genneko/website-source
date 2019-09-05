@@ -1,7 +1,7 @@
 ---
 title: "Using Joplin (Terminal and Desktop) and Web Clipper on FreeBSD"
 date: 2019-06-21T23:20:00+09:00
-lastmod: 2019-07-28T06:52:00+09:00
+lastmod: 2019-09-05T17:50:00+09:00
 draft: false
 tags: [ "application", "nodejs", "installation", "freebsd" ]
 toc: true
@@ -192,7 +192,7 @@ So please refer to [the section](#build-the-app-from-source) and replace the ste
 ```
 git clone https://github.com/genneko/joplin.git
 cd joplin
-git checkout -b headless_proxy origin/headless_proxy
+git checkout headless_proxy
 ```
 
 This custom terminal app can be run the same as the original one.
@@ -221,7 +221,10 @@ After successfully building the terminal app, I realized that Electron was added
 Because I'm not familiar with Electron at all, the following steps are just what I did to run the app and they might not be the right way. But I wrote them as a record anyway.
 
 
-1. Configure pkg to use the latest package set.
+1. Configure pkg to use the latest package set.  
+
+    **2019-09-05**  
+    **This step is no longer required. electron4 package has been available in "quarterly" for some time now.**
 
     This change is required because the default "quarterly" set didn't have devel/electron4 yet.  
     It was achieved by creating an overriding repository configuration file FreeBSD.conf in /usr/local/etc/pkg/repos and recreating the repository catalog as follows.
@@ -247,23 +250,31 @@ pkgconf and vips are required for installing node-gyp.
     sudo npm install -g node-gyp
     ```
 
-4. Get (clone) the source from GitHub.  
+4. Get (clone) the source from GitHub and apply a patch.  
     ```
     cd ~/tmp/or/somewhere
     git clone https://github.com/laurent22/joplin.git
     ```
-
-5. Build the tools.  
+   To successfully build the Electron app, I had to make small modifications to at least two files.  
+   They might be wrong ways but anyway here's [a patch](https://gist.githubusercontent.com/genneko/fbd6420404caf5d518563bb056cf46ed/raw/75183ecdea088152fc2bb0dfceb8a6096dc5a427/patch-joplin-electron-freebsd.txt) to apply as follows.
     ```
-    cd joplin/Tools
-    npm install
-    ```
-
-6. Before building the Electron app, I had to make small modifications to at least two files.  
-They might be wrong ways but anyway here's [a patch](https://gist.githubusercontent.com/genneko/fbd6420404caf5d518563bb056cf46ed/raw/75183ecdea088152fc2bb0dfceb8a6096dc5a427/patch-joplin-electron-freebsd.txt) to apply as follows.
-    ```
-    cd ..
+    cd joplin
     patch < ~/tmp/patch-joplin-electron-freebsd.txt
+    ```
+    **2019-09-05**  
+    **Instead of manually applying the patch to the upstream source, my forked version can also be used as follows.** _(Sorry, but at your own risk)_
+    ```
+    cd ~/tmp/or/somewhere
+    git clone https://github.com/genneko/joplin.git
+    cd joplin
+    git checkout electron_freebsd
+    ```
+    _'electron\_freebsd' branch has the previously mentioned patch applied. 'headless\_proxy' also includes the patch in addition to 'headless' and 'proxy' support patches._
+
+6. Build the tools.  
+    ```
+    cd Tools
+    npm install
     ```
 
 7. Build the Electron app by mostly following the [build instruction](https://github.com/laurent22/joplin/blob/master/BUILD.md#building-the-electron-application).  
@@ -418,13 +429,15 @@ This makes me dream of writing a small web frontend with Mojolicious or some kin
 * GitHub: sciurius/perl-Joplin-API  
 <https://github.com/sciurius/perl-Joplin-API>
 
-* FreeBSD Forum: Electron for FreeBSD
+* FreeBSD Forum: Electron for FreeBSD  
 <https://forums.freebsd.org/threads/electron-for-freebsd.64103/>
 
-* FreshPorts: devel/electron4
+* FreshPorts: devel/electron4  
 <https://www.freshports.org/devel/electron4/>
 
 ## Revision History
 * 2019-06-21: Created
 * 2019-06-23: Added "Desktop Application" and changed the article title
 * 2019-07-28: Corrected wrong paths for custom pkg config file
+* 2019-09-05: Added notes on the latest status  
+  (on the FreeBSD pkg repo "quarterly" and my forked joplin repo/branches including a patch to build desktop app on FreeBSD)
