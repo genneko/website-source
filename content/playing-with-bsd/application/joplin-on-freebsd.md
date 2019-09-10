@@ -1,7 +1,7 @@
 ---
 title: "Using Joplin (Terminal and Desktop) and Web Clipper on FreeBSD"
 date: 2019-06-21T23:20:00+09:00
-lastmod: 2019-09-05T17:50:00+09:00
+lastmod: 2019-09-10T22:48:00+09:00
 draft: false
 tags: [ "application", "nodejs", "installation", "freebsd" ]
 toc: true
@@ -269,7 +269,7 @@ pkgconf and vips are required for installing node-gyp.
     cd joplin
     git checkout electron_freebsd
     ```
-    _'electron\_freebsd' branch has the previously mentioned patch applied. 'headless\_proxy' also includes the patch in addition to 'headless' and 'proxy' support patches._
+    _'electron\_freebsd' branch has the previously mentioned patch applied. 'electron\_freebsd\_proxy' also includes the patch in addition to the 'proxy' support patch._
 
 6. Build the tools.  
     ```
@@ -441,3 +441,5 @@ This makes me dream of writing a small web frontend with Mojolicious or some kin
 * 2019-07-28: Corrected wrong paths for custom pkg config file
 * 2019-09-05: Added notes on the latest status  
   (on the FreeBSD pkg repo "quarterly" and my forked joplin repo/branches including a patch to build desktop app on FreeBSD)
+* 2019-09-10: Updated a note on my fork.  
+  (I've abandoned headless\_proxy in favor of electron\_freebsd\_proxy branch because upstream/master now seems to include beta headless support.)
