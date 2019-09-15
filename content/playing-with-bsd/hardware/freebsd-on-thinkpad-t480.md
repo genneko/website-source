@@ -1,7 +1,7 @@
 ---
 title: "ThinkPad T480 is my new main laptop which runs FreeBSD"
 date: 2019-08-22T00:50:00+09:00
-lastmod: 2019-08-27T20:11:00+09:00
+lastmod: 2019-09-15T15:02:00+09:00
 draft: false
 tags: [ "laptop", "desktop", "xorg", "installation", "freebsd" ]
 toc: true
@@ -245,6 +245,54 @@ hw.psm.synaptics.min_pressure=220
 moused_flags="-V"
 ```
 
+### Suspend/Resume
+I can perform suspend/resume by running ``acpiconf -s 3`` or from the XFCE4's "Logout" dialog almost out of the box.  
+But at some point, I realized the following behaviors of the Logout dialog.
+
+- When I login for the first time after the system boots, the dialog shows all of "Logout", "Reboot", "Shutdown", "Suspend" and "Hibernate" and all work fine.  
+(I think the last one is not supported by the OS and haven't tried it) 
+- When I resume the suspended system or login after logging out, the dialog only shows "Logout" in active state and other options are grayed out or not displayed.
+
+Finally, this problem was solved by creating the following polkit rule file in /usr/local/etc/polkit-1/rules.d as '85-suspend.rules'.
+
+_NOTE: To use this configuration, your user have to be in operator group. I did this during installation as mentioned earlier._
+```
+// pkg info -D xfce4-session
+//
+// xfce4-session-4.12.1_6:
+// Always:
+// To be able to shutdown or reboot your system, you'll have to add .rules
+// files in /usr/local/etc/polkit-1/rules.d directory. Which looks
+// like this (replace PUTYOURGROUPHERE by your group):
+
+polkit.addRule(function (action, subject) {
+  if ((action.id == "org.freedesktop.consolekit.system.restart" ||
+      action.id == "org.freedesktop.consolekit.system.stop")
+      && subject.isInGroup("operator")) {
+    return polkit.Result.YES;
+  }
+});
+
+// For those who have working suspend/resume:
+
+polkit.addRule(function (action, subject) {
+  if (action.id == "org.freedesktop.consolekit.system.suspend"
+      && subject.isInGroup("operator")) {
+    return polkit.Result.YES;
+  }
+});
+
+// Explicitly disallow hibernation because it's not supported by the OS.
+
+polkit.addRule(function (action, subject) {
+  if (action.id == "org.freedesktop.consolekit.system.hibernate") {
+    return polkit.Result.NO;
+  }
+});
+```
+
+Now suspend/resume seems to work more reliably by lid close/open, by command or from Logout dialog!
+
 ### Screen Brightness
 - XFCE4 Power Manager's Brightness Control sometimes shows weird behavior. When I switch the power between AC and battery, screen brightness initially changes as configured but gets back to the previous level when I move mouse cursor.  
 After struggling for a while, I found the following configurations with the XFCE4's brightness adjustment disabled allow me to automatically adjust brightness upon change of the power source (AC or battery).  
@@ -412,7 +460,11 @@ kld_list="/boot/modules/i915kms.ko if_iwm iwm8265fw"
 * FreeBSD Forum: How to disable mousepad tapping ?  
 <https://forums.freebsd.org/threads/how-to-disable-mousepad-tapping.17370/>
 
+* FreeBSD Forum: xfce4-power-manager plugin not working as expected
+<https://forums.freebsd.org/threads/xfce4-power-manager-plugin-not-working-as-expected.67780/>
+
 ## Revision History
 * 2019-08-22: Created
 * 2019-08-27: Added "Failover between Ethernet and WiFi"
+* 2019-09-15: Added "Suspend/Resume"
 
