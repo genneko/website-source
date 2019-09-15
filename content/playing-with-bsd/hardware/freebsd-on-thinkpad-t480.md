@@ -246,16 +246,19 @@ moused_flags="-V"
 ```
 
 ### Suspend/Resume
-I can perform suspend/resume by running ``acpiconf -s 3`` or from the XFCE4's "Logout" dialog almost out of the box.  
+I was able to perform suspend/resume by running ``acpiconf -s 3`` or from the XFCE4's "Logout" dialog almost out of the box.  
 But at some point, I realized the following behaviors of the Logout dialog.
 
-- When I login for the first time after the system boots, the dialog shows all of "Logout", "Reboot", "Shutdown", "Suspend" and "Hibernate" and all work fine.  
-(I think the last one is not supported by the OS and haven't tried it) 
-- When I resume the suspended system or login after logging out, the dialog only shows "Logout" in active state and other options are grayed out or not displayed.
+  - When I login for the first time after the system boots, the dialog shows all of "Logout", "Reboot", "Shutdown", "Suspend" and "Hibernate" and all work fine.  
+(I thought the last one was not supported by the OS and didn't tried it) 
 
-Finally, this problem was solved by creating the following polkit rule file in /usr/local/etc/polkit-1/rules.d as '85-suspend.rules'.
+  - When the suspended system resumes or I login to the system after logging out, the dialog only shows "Logout" in active state and other options are grayed out or not displayed at all.
 
-_NOTE: To use this configuration, your user have to be in operator group. I did this during installation as mentioned earlier._
+After some struggle, those were solved by creating the following polkit rule file (e.g. 85-suspend.rules) in /usr/local/etc/polkit-1/rules.d directory.
+
+<https://forums.freebsd.org/threads/xfce4-power-manager-plugin-not-working-as-expected.67780/>
+
+_NOTE: To use this configuration, your user account have to be in operator group. I did this during installation as mentioned earlier._
 ```
 // pkg info -D xfce4-session
 //
@@ -291,7 +294,7 @@ polkit.addRule(function (action, subject) {
 });
 ```
 
-Now suspend/resume seems to work more reliably by lid close/open, by command or from Logout dialog!
+Now suspend/resume seems to work more reliably by command, lid close/open or from Logout dialog!
 
 ### Screen Brightness
 - XFCE4 Power Manager's Brightness Control sometimes shows weird behavior. When I switch the power between AC and battery, screen brightness initially changes as configured but gets back to the previous level when I move mouse cursor.  
@@ -460,8 +463,6 @@ kld_list="/boot/modules/i915kms.ko if_iwm iwm8265fw"
 * FreeBSD Forum: How to disable mousepad tapping ?  
 <https://forums.freebsd.org/threads/how-to-disable-mousepad-tapping.17370/>
 
-* FreeBSD Forum: xfce4-power-manager plugin not working as expected
-<https://forums.freebsd.org/threads/xfce4-power-manager-plugin-not-working-as-expected.67780/>
 
 ## Revision History
 * 2019-08-22: Created
