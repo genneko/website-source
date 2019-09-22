@@ -1,7 +1,7 @@
 ---
 title: "ThinkPad T480 is my new main laptop which runs FreeBSD"
 date: 2019-08-22T00:50:00+09:00
-lastmod: 2019-09-15T15:02:00+09:00
+lastmod: 2019-09-22T10:48:00+09:00
 draft: false
 tags: [ "laptop", "desktop", "xorg", "installation", "freebsd" ]
 toc: true
@@ -335,7 +335,7 @@ Audacity itself can be installed via binary package.
 - See [this article](/playing-with-bsd/application/joplin-on-freebsd).
 
 ### OneDrive
-<https://skilion.github.io/onedrive/>
+<https://github.com/abraunegg/onedrive>
 
 - On the previous main PC (Windows 10), I used OneDrive to import photos taken and uploaded by smartphones. 
 OneDrive Free Client allows me to achieve this on FreeBSD machine.
@@ -468,4 +468,4 @@ kld_list="/boot/modules/i915kms.ko if_iwm iwm8265fw"
 * 2019-08-22: Created
 * 2019-08-27: Added "Failover between Ethernet and WiFi"
 * 2019-09-15: Added "Suspend/Resume"
-
+* 2019-09-22: Updated the OneDrive Free Client's URL
