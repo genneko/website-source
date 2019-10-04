@@ -321,6 +321,11 @@ Apply system updates to a jail.
 sudo freebsd-update -b /vm/h1 fetch install
 ```
 
+If the host OS is newer, set UNAME_r to the jail's version.
+```
+sudo UNAME_r=11.1-RELEASE freebsd-update -b /vm/h1 fetch install
+```
+
 Upgrade system on a jail.
 ```
 sudo freebsd-update -b /vm/h1 -r 11.3-RELEASE upgrade
