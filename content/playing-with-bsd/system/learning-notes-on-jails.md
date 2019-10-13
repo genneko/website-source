@@ -1,7 +1,7 @@
 ---
 title: "Learning Notes on FreeBSD Jails"
 date: 2018-10-07T18:35:49+09:00
-lastmod: 2019-05-05T18:00:00+09:00
+lastmod: 2019-10-13T10:17:00+09:00
 draft: false
 tags: [ "freebsd", "jail", "virtualization", "administration" ]
 toc: true
@@ -321,7 +321,7 @@ Apply system updates to a jail.
 sudo freebsd-update -b /vm/h1 fetch install
 ```
 
-If the host OS is newer, set UNAME_r to the jail's version.
+If the host OS is newer than a jail, set UNAME_r to the jail's version.
 ```
 sudo UNAME_r=11.1-RELEASE freebsd-update -b /vm/h1 fetch install
 ```
@@ -331,14 +331,18 @@ Upgrade system on a jail.
 sudo freebsd-update -b /vm/h1 -r 11.3-RELEASE upgrade
 ```
 
-When you have already upgraded the host, run the following commands in a jail.
+When you have already upgraded the host, set UNAME_r to the jail's version.
 ```
-setenv UNAME_r `freebsd-version`
-freebsd-update -r 11.3-RELEASE upgrade
-/usr/sbin/freebsd-update install
-(No reboot required for a jail)
-unsetenv UNAME_r
-/usr/sbin/freebsd-update install
+sudo UNAME_r=11.2-RELEASE-p4 freebsd-update -b /vm/h1 -r 11.3-RELEASE upgrade
+sudo UNAME_r=11.2-RELEASE-p4 freebsd-update -b /vm/h1 install
+# Although the following message is displayed here, reboot is not required for a jail.
+#
+#   Kernel updates have been installed.  Please reboot and run
+#   "/usr/sbin/freebsd-update install" again to finish installing updates.
+#
+# Just run the following command without UNAME_r to update the userland.
+# (UNAME_r is no longer needed because the jail has the same kernel version as the host now)
+sudo freebsd-update -b /vm/h1 install
 ```
 
 ## VNET Jails
@@ -800,3 +804,4 @@ https://github.com/genneko/freebsd-vimage-jails
 * 2018-10-07: Created
 * 2018-12-14: Add a note on FreeBSD 12.0
 * 2019-01-19: Add "Separate Network Configuration" to "VNET Jails"
+* 2019-10-13: Update the procedure to run "freebsd-update upgrade" on jails
