@@ -1,7 +1,7 @@
 ---
 title: "Learning Notes on FreeBSD Jails"
 date: 2018-10-07T18:35:49+09:00
-lastmod: 2019-10-13T10:17:00+09:00
+lastmod: 2019-10-25T22:35:00+09:00
 draft: false
 tags: [ "freebsd", "jail", "virtualization", "administration" ]
 toc: true
@@ -105,7 +105,17 @@ Also create /etc/make.conf to use the directories for building ports in jails.
 	sudo freebsd-update -b /vm/tmpl/11.2 fetch install
 	```
 
-9. Take a snapshot of the template dataset.  
+9. Optionally, you can customize the jails' root shell prompt to make it easily distinguishable from the host.
+	```
+	sudo vi /vm/tmpl/11.2/root/.cshrc
+	```
+
+	```
+	# ANSI Color 32 = Green
+	set prompt="%{\033[32m%}%B<%n@%m>%b%{\033[0m%}:%~%# "
+	```
+
+10. Take a snapshot of the template dataset.  
 Strictly speaking, a template is a snapshot not a dataset. The snapshot can be cloned or sent/received to generate new datasets for production jails.
 
 	```
@@ -805,3 +815,4 @@ https://github.com/genneko/freebsd-vimage-jails
 * 2018-12-14: Add a note on FreeBSD 12.0
 * 2019-01-19: Add "Separate Network Configuration" to "VNET Jails"
 * 2019-10-13: Update the procedure to run "freebsd-update upgrade" on jails
+* 2019-10-25: Add an optional "change jail's root prompt" step to "Creating a Template"
