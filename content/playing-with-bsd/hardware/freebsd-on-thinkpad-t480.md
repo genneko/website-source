@@ -455,7 +455,7 @@ I adjusted the device permissions with devfs.
    add path pass1 group operator mode 0660
    add path xpt0 group operator mode 0660
    ```
-   Maybe 'cd0', 'pass1' and 'xpt0' should be 'cd\*', 'pass\*' and 'xpt\*'.  
+   Maybe 'cd0', 'pass1' and 'xpt0' could be 'cd\*', 'pass\*' and 'xpt\*'.  
    But for now I use the formers with the following output.
    ```
    camcontrol devlist
