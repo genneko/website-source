@@ -1,7 +1,7 @@
 ---
 title: "ThinkPad T480 is my new main laptop which runs FreeBSD"
 date: 2019-08-22T00:50:00+09:00
-lastmod: 2019-09-22T10:48:00+09:00
+lastmod: 2019-11-09T11:23:00+09:00
 draft: false
 tags: [ "laptop", "desktop", "xorg", "installation", "freebsd" ]
 toc: true
@@ -418,6 +418,61 @@ kld_list="/boot/modules/i915kms.ko if_iwm iwm8265fw"
 ```
 (As I previously mentioned, i915kms.ko is for graphics.)
 
+### Burning CDs
+I hadn't burnt CDs for a long time but recently I was asked to create an audio CD. So I plugged in a USB CD-R/RW drive to my laptop and tried it on FreeBSD.
+
+I found my system already had GUI-based Xfburn and Brasero in addition to cdrecord, a good old command-line burner program.
+
+At first I tried GUI-based ones but both said 'No burner found'. Because I was in a hurry at the time, I used cdrecord (as root) for the first time in 15 years.
+
+1. Check the CD drive's device number.  
+   ```
+   sudo cdrecord -scanbus
+   ...
+   	1,0,0	100) 'BUFFALO ' 'Optical Drive   ' '2.00' Removable CD-ROM
+   ...
+   ```
+
+2. Burn it.  
+   ```
+   sudo cdrecord -v dev=1,0,0 -pad -dao music.wav 
+   ```
+
+Because running cdrecord with root privilege could burn CDs, it was obvious that device permissions kept the GUI burners run by a normal user from finding the burner.
+
+cd0 had the following owner/mode. As my user account (a normal user) was in operator group, I could read from the device but couldn't write to it.
+```
+crw-r-----  1 root  operator   0x7f Nov  9 10:16 cd0
+```
+
+I adjusted the device permissions with devfs.
+
+1. Add the following a devfs ruleset in /etc/devfs.rules.  
+   I added pass and xpt because adding only cd0 didn't work.
+   ```
+   [devfsrules_cdwriter=20]
+   add path cd0 group operator mode 0660
+   add path pass1 group operator mode 0660
+   add path xpt0 group operator mode 0660
+   ```
+   Maybe 'cd0', 'pass1' and 'xpt0' should be 'cd\*', 'pass\*' and 'xpt\*'.  
+   But for now I use the formers with the following output.
+   ```
+   camcontrol devlist
+   <Samsung SSD 860 EVO 1TB RVT02B6Q>  at scbus0 target 0 lun 0 (ada0,pass0)
+   <BUFFALO Optical Drive 2.00>       at scbus1 target 0 lun 0 (pass1,cd0)
+   <Generic- SD/MMC 1.00>             at scbus2 target 0 lun 0 (da0,pass2)
+   ```
+
+2. Add a line to /etc/rc.conf to use the devfs ruleset.
+   ```
+   devfs_system_ruleset="devfsrules_cdwriter"
+   ```
+
+3. Reboot the system.
+
+4. Now I can burn CDs with GUI programs too.
+
 ## References
 * FreeBSD wiki: Laptops running FreeBSD  
 <https://wiki.freebsd.org/Laptops>
@@ -469,3 +524,4 @@ kld_list="/boot/modules/i915kms.ko if_iwm iwm8265fw"
 * 2019-08-27: Added "Failover between Ethernet and WiFi"
 * 2019-09-15: Added "Suspend/Resume"
 * 2019-09-22: Updated the OneDrive Free Client's URL
+* 2019-11-09: Added "Burning CDs"
