@@ -231,7 +231,7 @@ sudo pkg install firefox thunderbird chromium ...
 ### Touchpad and TrackPoint
 <https://ben-rowan.github.io/post/disable_lenovo_trackpad/>  
 
-- As I use a wireless mouse (Logicool's Unifying one) most of the time, I disabled touchpad and enabled "Virtual Scrolling" with the TrackPoing and the middle button instead.  
+- As I use a wireless mouse (Logicool's Unifying one) most of the time, I disabled touchpad and enabled "Virtual Scrolling" with the TrackPoint and the middle button instead.  
 [/boot/loader.conf]  
 ```
 hw.psm.synaptics_support="1"
