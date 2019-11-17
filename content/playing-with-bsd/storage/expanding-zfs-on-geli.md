@@ -6,7 +6,7 @@ tags: [ "storage", "zfs", "geli", "freebsd" ]
 toc: false
 ---
 My personal FreeBSD 11.3 server (VPS) was running low on storage space.  
-By using the VPS provider's "scale-up" option, I could easily grow the virtual disk.  
+By using the VPS provider's disk expansion option, I could easily grow the virtual disk.  
 But then I wondered how to expand the filesystem on it.
 
 In my case, the filesystem is on a GELI-encrypted ZFS storage pool.  
@@ -67,9 +67,9 @@ After rehearsing on VirtualBox VMs, I took the following steps to get more free 
    ...
    ```
 
-1. Shutdown the server and apply "scale-up" option to increase the virtual disk size.
+1. Shutdown the server and apply disk expansion option to increase the virtual disk size.
 
-2. Once the "scale-up" opearation at the VPS provider is complete, boot the server with FreeBSD 11.3 installer ISO and open a console.
+2. Once the disk expansion opearation at the VPS provider is complete, boot the server with FreeBSD 11.3 installer ISO and open a console.
 
 3. Go into "Shell" at the installer's Welcome screen.
 
@@ -134,7 +134,7 @@ Run the following command to fix this by using the primary metadata at the begin
    ```
 
 9. That's all!  
-The whole process only took an hour where the scale-up operation at the VPS provider took about 50 minutes.  
+The whole process only took an hour where the disk expansion operation at the VPS provider took about 50 minutes.  
    ```
    # gpart show
    =>       40  838860720  vtbd0  GPT  (400G)
