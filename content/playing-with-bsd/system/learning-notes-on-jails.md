@@ -1,7 +1,7 @@
 ---
 title: "Learning Notes on FreeBSD Jails"
 date: 2018-10-07T18:35:49+09:00
-lastmod: 2019-10-25T22:35:00+09:00
+lastmod: 2020-01-13T22:45:00+09:00
 draft: false
 tags: [ "freebsd", "jail", "virtualization", "administration" ]
 toc: true
@@ -29,98 +29,137 @@ When you start using jails, the first thing to do is creating a template for fut
 1. Create ZFS datasets for jails and templates.  
 Here I'm going to create a FreeBSD 11.2 template in /vm/tmpl/11.2.
 
-	```
-	sudo zfs create -o mountpoint=/vm zroot/vm
-	sudo zfs create zroot/vm/tmpl
-	sudo zfs create zroot/vm/tmpl/11.2
-	```
+   ```
+   sudo zfs create -o mountpoint=/vm zroot/vm
+   sudo zfs create zroot/vm/tmpl
+   sudo zfs create zroot/vm/tmpl/11.2
+   ```
 
 2. Download a base install set tarball for FreeBSD 11.2 release.
 
-	```
-	cd ~/tmp
-	fetch ftp://ftp.freebsd.org/pub/FreeBSD/releases/amd64/11.2-RELEASE/base.txz
-	```
+   ```
+   cd ~/tmp
+   fetch ftp://ftp.freebsd.org/pub/FreeBSD/releases/amd64/11.2-RELEASE/base.txz
+   ```
 
 3. Extract the base tarball in the template directory.
 
-	```
-	sudo tar -xJvpf base.txz -C /vm/tmpl/11.2
-	```
+   ```
+   sudo tar -xJvpf base.txz -C /vm/tmpl/11.2
+   ```
 
 4. Copy timezone configuration from the host to the template.  
 Usually /etc/resolv.conf is also copied from the host, but after some experiments I decided to copy it by using /etc/jail.conf's exec.prestart and delete it by exec.poststop.
 
-	```
-	sudo cp /etc/localtime /vm/tmpl/11.2/etc/
-	```
+   ```
+   sudo cp /etc/localtime /vm/tmpl/11.2/etc/
+   ```
 
 5. Write a minimum /etc/rc.conf for the template.  
-Here I disable cron in jails but it might be better to leave it enabled and fine-tune its configurations.  
-I need more research on this.
 
-	```
-	sudo vi /vm/tmpl/11.2/etc/rc.conf
-	```
+   ```
+   sudo vi /vm/tmpl/11.2/etc/rc.conf
+   ```
 
-	```
-	cron_enable="NO"
-	sendmail_enable="NO"
-	sendmail_submit_enable="NO"
-	sendmail_outbound_enable="NO"
-	sendmail_msp_queue_enable="NO"
-	syslogd_flags="-ss"
-	```
+   ```
+   sendmail_enable="NO"
+   sendmail_submit_enable="NO"
+   sendmail_outbound_enable="NO"
+   sendmail_msp_queue_enable="NO"
+   syslogd_flags="-ss"
+   ```
 
 6. Edit system crontab in the template to disable adjkern.  
-Obviously this is not necessary because I disabled cron in the previous step but I do this as a precaution anyway.
 
-	```
-	sudo vi /vm/tmpl/11.2/etc/crontab
-	```
+   ```
+   sudo vi /vm/tmpl/11.2/etc/crontab
+   ```
 
-	```
-	#1,31 0-5 * * * root adjkerntz -a
-	```
+   ```
+   #1,31 0-5 * * * root adjkerntz -a
+   ```
+
+7. Create /etc/periodic.conf to disable some of the predefined scheduled jobs which are not required for jails.  
+   ```
+   sudo vi /vm/tmpl/11.2/etc/periodic.conf
+   ```
+   ```
+   # No output for successful script runs.
+   daily_show_success="NO"
+   weekly_show_success="NO"
+   monthly_show_success="NO"
+   security_show_success="NO"
+   
+   # Output to log files which are rotated by default.
+   daily_output="/var/log/daily.log"
+   daily_status_security_output="/var/log/daily.log"
+   weekly_output="/var/log/weekly.log"
+   weekly_status_security_output="/var/log/weekly.log"
+   monthly_output="/var/log/monthly.log"
+   monthly_status_security_output="/var/log/monthly.log"
+   
+   # No need for those without sendmail
+   daily_clean_hoststat_enable="NO"
+   daily_status_mail_rejects_enable="NO"
+   daily_status_mailq_enable="NO"
+   daily_queuerun_enable="NO"
+   
+   # Host does those
+   daily_status_disks_enable="NO"
+   daily_status_zfs_zpool_list_enable="NO"
+   daily_status_network_enable="NO"
+   daily_status_uptime_enable="NO"
+   daily_ntpd_leapfile_enable="NO"
+   weekly_locate_enable="NO"
+   weekly_whatis_enable="NO"
+   security_status_chksetuid_enable="NO"
+   security_status_neggrpperm_enable="NO"
+   security_status_chkuid0_enable="NO"
+   security_status_ipfwdenied_enable="NO"
+   security_status_ipfdenied_enable="NO"
+   security_status_ipfwlimit_enable="NO"
+   security_status_ipf6denied_enable="NO"
+   security_status_tcpwrap_enable="NO"
+   ```
 
 7. Create directories to handle ports in jails.  
 The first one is to read-only mount host's ports tree and others are working spaces.  
 Also create /etc/make.conf to use the directories for building ports in jails.
 
-	```
-	sudo mkdir /vm/tmpl/11.2/usr/ports
-	sudo mkdir -p /vm/tmpl/11.2/var/ports/{distfiles,packages}
-	sudo vi /vm/tmpl/11.2/etc/make.conf
-	```
+   ```
+   sudo mkdir /vm/tmpl/11.2/usr/ports
+   sudo mkdir -p /vm/tmpl/11.2/var/ports/{distfiles,packages}
+   sudo vi /vm/tmpl/11.2/etc/make.conf
+   ```
 
-	```
-	WRKDIRPREFIX = /var/ports
-	DISTDIR = /var/ports/distfiles
-	PACKAGES = /var/ports/packages
-	```
+   ```
+   WRKDIRPREFIX = /var/ports
+   DISTDIR = /var/ports/distfiles
+   PACKAGES = /var/ports/packages
+   ```
 
 8. Apply system updates to the template.
 
-	```
-	sudo freebsd-update -b /vm/tmpl/11.2 fetch install
-	```
+   ```
+   sudo freebsd-update -b /vm/tmpl/11.2 fetch install
+   ```
 
 9. Optionally, you can customize the jails' root shell prompt to make it easily distinguishable from the host.
-	```
-	sudo vi /vm/tmpl/11.2/root/.cshrc
-	```
+   ```
+   sudo vi /vm/tmpl/11.2/root/.cshrc
+   ```
 
-	```
-	# ANSI Color 32 = Green
-	set prompt="%{\033[32m%}%B<%n@%m>%b%{\033[0m%}:%~%# "
-	```
+   ```
+   # ANSI Color 32 = Green
+   set prompt="%{\033[32m%}%B<%n@%m>%b%{\033[0m%}:%~%# "
+   ```
 
 10. Take a snapshot of the template dataset.  
 Strictly speaking, a template is a snapshot not a dataset. The snapshot can be cloned or sent/received to generate new datasets for production jails.
 
-	```
-	sudo zfs snapshot zroot/vm/tmpl/11.2@p3
-	```
+    ```
+    sudo zfs snapshot zroot/vm/tmpl/11.2@p3
+    ```
 
 ## Creating Jails from the Template
 
@@ -810,9 +849,13 @@ https://mwl.io/nonfiction/os#fmjail
 * GitHub: genneko/freebsd-vimage-jails  
 https://github.com/genneko/freebsd-vimage-jails
 
+* Dan Langille's gist: Periodic things to turn off in FreeBSD jails  
+https://gist.github.com/dlangille/ce60ac76b69f267a3f1de33495a338fc
+
 ## Revision History
 * 2018-10-07: Created
 * 2018-12-14: Add a note on FreeBSD 12.0
 * 2019-01-19: Add "Separate Network Configuration" to "VNET Jails"
 * 2019-10-13: Update the procedure to run "freebsd-update upgrade" on jails
 * 2019-10-25: Add an optional "change jail's root prompt" step to "Creating a Template"
+* 2020-01-13: Add periodic.conf and enable cron in jails.
