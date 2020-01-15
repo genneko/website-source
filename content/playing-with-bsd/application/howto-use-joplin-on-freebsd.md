@@ -1,22 +1,28 @@
 ---
-title: "How to use Joplin Electron app on FreeBSD"
-date: 2020-01-15T06:00:00+09:00
-draft: true
-tags: [ "application", "nodejs", "installation", "freebsd" ]
+title: "How to use Joplin desktop app on FreeBSD"
+date: 2020-01-15T20:26:00+09:00
+draft: false
+tags: [ "application", "installation", "freebsd", "font" ]
 toc: true
 ---
-This is a quick summary of how to use the latest Joplin Electron app on FreeBSD.
+This is a quick note on how I build and use the latest Joplin desktop app on FreeBSD.
 
-Please refer to [another article](/playing-with-bsd/application/joplin-on-freebsd) for my initial exploration of Joplin.
+For my initial exploration of Joplin on FreeBSD, please refer to the [previous post](/playing-with-bsd/application/joplin-on-freebsd).
 
-## Installing Joplin v1.0.177
+## Target Version
+The current target version of this article is Joplin Electron (pre-)release v1.0.177 (Dec 2019).
+![Joplin Version](/images/howto-use-joplin-on-freebsd/JoplinVersion.png)
+
+## Building Joplin
+I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE system (with XFCE4 desktop).
+
 1. Install dependencies such as Electron and Nodejs.  
    ```
    sudo pkg install electron6 node10 npm-node10 python
    ```
 > The latest Joplin uses Electron7 but it's not yet available in the FreeBSD ports tree. Thus I use Electron6 here and haven't found any problem so far.  
 
-2. Clone my forked version of Joplin and switch to electron_freebsd branch, which includes patches for FreeBSD.
+2. Clone my forked version of Joplin and switch to electron_freebsd branch, which includes some modifications for FreeBSD.
    ```
    cd ~/tmp/or/somewhere
    git clone https://github.com/genneko/joplin.git
@@ -33,35 +39,38 @@ Please refer to [another article](/playing-with-bsd/application/joplin-on-freebs
    npm install
    ```
 
-4. Now you can run the app by running the following commands.  
+4. Now you can run the app by running the following command  
    ```
    electron .
    ```
-   or
+   or by running a script included in my fork
    ```
    ../joplin-desktop
    ```
 
-## Workaround for weird character when entering text with a CJK input method
+## Workaround for LSEP showing up in CJK input methods
+
+_**NOTE:** This is not FreeBSD-specific. But anyway, I wrote it down here for future reference._  
+
 This issue is reported several times as below.
 * [#1210](https://github.com/laurent22/joplin/issues/1210)
 * [#1497](https://github.com/laurent22/joplin/issues/1497)
 * [#1351](https://github.com/laurent22/joplin/issues/1351)
 
+As pointed out in the issue [#1500](https://github.com/laurent22/joplin/issues/1500), it looks like unfixable as it might be an Ace Editor issue.  
+But for users who have to use some "input method" for entering text, it is really annoying.
+
 ![Joplin LSEP](/images/howto-use-joplin-on-freebsd/JoplinLSEP.gif)
 
-For users who have to use some "input method" for entering text, it is really annoying.  
-But as [#1500](https://github.com/laurent22/joplin/issues/1500) says, it might be unfixable as it might be an Ace issue.
+Fortunately, this issue can be worked around by using a [special font](/misc/NoLSEP.ttf) which has only a single zero-width glyph for the weird character (U+2028 Line Separator).
 
-Luckily, you can still work around it by using a [special font](xxxx) which has only a single zero-width glyph for the weird character.
+* If you are satisfied with the default editor font, you can just install the special font on your system and specify it in Tools &gt; Options &gt; Appearance &gt; Editor font family.  
+  The weird character will be suppressed because it will be shown with the zero-width glyph in the specified font while other characters will be displayed with the default monospace font because they are not included in the special font.
 
-* If you are satisfied with the default editor font, just specify the special font in Option's "Editor Font".
-  The weird character will be suppressed because it will be shown with the zero-width glyph in the specified custom font while other characters will be displayed with the default monospace font.
-
-* If you are using a custom editor font, you cannot specify the special font in "Editor Font" because it overrides the custom font. ("Editor Font" can take only a single font name)  
-  But if you have Joplin v1.0.176 or later, you can use "Custom stylesheet for Joplin-wide app styles" (userchrome.css) to work around this issue while you continue to use the custom editor font.  
-  Just store the special font file somewhere and create "Custom stylesheet for Joplin-wide app styles" [^1] from Tools &gt; Options &gt; Appearance with the following content.
-[^1]: The menu creates and edits ~/.config/joplin-desktop/userchrome.css.
+* If you are using a custom editor font, you cannot specify the special font in "Editor font family" because it can take only a single font name thus overrides your custom choice.   
+  But if you have Joplin [v1.0.176](https://github.com/laurent22/joplin/releases/tag/v1.0.176) or later, you can use the Joplin-wide stylesheet to work around this issue while you continue to use the custom editor font.  
+  Just store the special font file somewhere and create Joplin-wide stylesheet from Tools &gt; Options &gt; Appearance &gt; Custom stylesheet for Joplin-wide app styles[^1].  
+  For example, if you saved the special font as /home/username/share/fonts/NoLSEP.ttf and want to use IPAGothic as the custom editor font, the stylesheet should look like this.
   ```
   @font-face {
       font-family: NoLSEP;
@@ -72,6 +81,23 @@ Luckily, you can still work around it by using a [special font](xxxx) which has 
       font-family: NoLSEP, IPAGothic, monospace !important;
   }
   ```
+  > NOTE  
+  > By default, Joplin uses the following style for its editor.
+  > ```
+  > .ace_editor * {
+  >     font-family: monospace !important;
+  > }
+  > ```
+  > If you specify "Editor font family", it goes like:
+  > ```
+  > .ace_editor * {
+  >     font-family: FontYouSpecified, monospace !important;
+  > }
+  > ```
+  > Because this style is placed AFTER the Joplin-wide styles, you have to give more score to the font-family spec in the Joplin-wide style.
+  > I changed selector from '.ace_editor' to 'div.ace_editor' for this.
+  
+[^1]: The menu creates and edits ~/.config/joplin-desktop/userchrome.css.
 
 ## References
 * Joplin  
@@ -82,12 +108,6 @@ Luckily, you can still work around it by using a [special font](xxxx) which has 
 
 * GitHub: genneko/joplin  
 <https://github.com/genneko/joplin>
-
-* FreeBSD Forum: Electron for FreeBSD  
-<https://forums.freebsd.org/threads/electron-for-freebsd.64103/>
-
-* FreshPorts: devel/electron6  
-<https://www.freshports.org/devel/electron6/>
 
 ## Revision History
 * 2020-01-15: Created

@@ -1,11 +1,15 @@
 ---
-title: "Using Joplin (Terminal and Desktop) and Web Clipper on FreeBSD"
+title: "Testing Joplin (Terminal and Desktop) and Web Clipper on FreeBSD"
 date: 2019-06-21T23:20:00+09:00
-lastmod: 2019-09-10T22:48:00+09:00
+lastmod: 2020-01-15T19:53:00+09:00
 draft: false
 tags: [ "application", "nodejs", "installation", "freebsd" ]
 toc: true
 ---
+_**TL;DR (2020-01-15)**_  
+_This article describes my initial exploration of Joplin in June 2019. It's not intended to be a tutorial/howto and it's not necessarily up to date.  
+Please refer to the [newer post](/playing-with-bsd/application/howto-use-joplin-on-freebsd) for more up-to-date and concise description on how to use Joplin on FreeBSD._
+
 I've been using Evernote since April 2011.  
 Although there were times the app got disappointing updates or the service was unexpectedly interrupted (or more often expectedly interrupted by regular maintenance), it had been a great app/service and hopefully it is and it will be.  
 
@@ -443,3 +447,4 @@ This makes me dream of writing a small web frontend with Mojolicious or some kin
   (on the FreeBSD pkg repo "quarterly" and my forked joplin repo/branches including a patch to build desktop app on FreeBSD)
 * 2019-09-10: Updated a note on my fork.  
   (I've abandoned headless\_proxy in favor of electron\_freebsd\_proxy branch because upstream/master now seems to include beta headless support.)
+* 2020-01-15: Added a "TL;DR" note.
