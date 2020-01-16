@@ -52,7 +52,7 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
 
 _**NOTE:** This is not FreeBSD-specific. But anyway, I wrote it down here for future reference._  
 
-This issue is reported several times as below.
+This issue was reported several times as below.
 * [#1210](https://github.com/laurent22/joplin/issues/1210)
 * [#1497](https://github.com/laurent22/joplin/issues/1497)
 * [#1351](https://github.com/laurent22/joplin/issues/1351)
