@@ -1,0 +1,16 @@
+diff --git a/ElectronClient/app/app.js b/ElectronClient/app/app.js
+index 6c6e7dc9..b8ba98c0 100644
+--- a/ElectronClient/app/app.js
++++ b/ElectronClient/app/app.js
+@@ -1061,7 +1061,10 @@ class Application extends BaseApplication {
+ 
+ 	updateEditorFont() {
+ 		const fontFamilies = [];
+-		if (Setting.value('style.editor.fontFamily')) fontFamilies.push(`"${Setting.value('style.editor.fontFamily')}"`);
++		let value = '';
++		if ((value = Setting.value('style.editor.fontFamily')) !== null && value.length > 0) {
++			value.split(',').forEach(family => fontFamilies.push(`"${family.trim().replace(/['"]/g, '')}"`));
++		}
+ 		fontFamilies.push('monospace');
+ 
+ 		// The '*' and '!important' parts are necessary to make sure Russian text is displayed properly

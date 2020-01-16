@@ -68,8 +68,8 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
   The weird character will be suppressed because it will be shown with the zero-width glyph in the specified font while other characters will be displayed with the default monospace font because they are not included in the special font.
 
 * If you are using a custom editor font, you cannot specify the special font in "Editor font family" because it can take only a single font name thus overrides your custom choice.   
-  But if you have Joplin [v1.0.176](https://github.com/laurent22/joplin/releases/tag/v1.0.176) or later, you can use the Joplin-wide stylesheet to work around this issue while you continue to use the custom editor font.  
-  Just store the special font file somewhere and create Joplin-wide stylesheet from Tools &gt; Options &gt; Appearance &gt; Custom stylesheet for Joplin-wide app styles[^1].  
+  But if you have Joplin [v1.0.176](https://github.com/laurent22/joplin/releases/tag/v1.0.176) or later[^1], you can use the Joplin-wide stylesheet to work around this issue while you continue to use the custom editor font.  
+  Just store the special font file somewhere and create Joplin-wide stylesheet from Tools &gt; Options &gt; Appearance &gt; Custom stylesheet for Joplin-wide app styles[^2].  
   For example, if you saved the special font as /home/username/share/fonts/NoLSEP.ttf and want to use IPAGothic as the custom editor font, the stylesheet should look like this.
   ```
   @font-face {
@@ -97,7 +97,8 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
   > Because this style is placed AFTER the Joplin-wide styles, you have to give more score to the font-family spec in the Joplin-wide style.
   > I changed selector from '.ace_editor' to 'div.ace_editor' for this.
   
-[^1]: The menu creates and edits ~/.config/joplin-desktop/userchrome.css.
+[^1]: Before the Joplin-wide stylesheet was implemented in v1.0.176, I had been using a [small patch](/misc/joplin_multi_editor_fonts.patch) to make "Editor font family" accept multiple fonts separated by comma.
+[^2]: The menu creates and edits ~/.config/joplin-desktop/userchrome.css.
 
 ## References
 * Joplin  
@@ -108,6 +109,12 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 
 * GitHub: genneko/joplin  
 <https://github.com/genneko/joplin>
+
+* anopara: Ace EditorでL SEPという文字が出る  
+<https://anopara.net/2018/01/19/ace-editor%E3%81%A7l-sep%E3%81%A8%E3%81%84%E3%81%86%E6%96%87%E5%AD%97%E3%81%8C%E5%87%BA%E3%82%8B/>
+
+* RAWSEQ: Aceエディタ で日本語入力時のちらつきを解消する  
+<https://qiita.com/RAWSEQ/items/7f9fc0fd4b3d572856ed>
 
 ## Revision History
 * 2020-01-15: Created
