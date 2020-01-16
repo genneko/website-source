@@ -67,10 +67,10 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 * If you are satisfied with the default editor font, you can just install the special font on your system and specify it in Tools &gt; Options &gt; Appearance &gt; Editor font family.  
   The weird character will be suppressed because it will be shown with the zero-width glyph in the specified font while other characters will be displayed with the default monospace font because they are not included in the special font.
 
-* If you are using a custom editor font, you cannot specify the special font in "Editor font family" because it can take only a single font name thus overrides your custom choice.   
+* If you are using a custom editor font, you cannot specify the special font in "Editor font family" because it can take only a single font name thus overrides the custom font.  
   But if you have Joplin [v1.0.176](https://github.com/laurent22/joplin/releases/tag/v1.0.176) or later[^1], you can use the Joplin-wide stylesheet to work around this issue while you continue to use the custom editor font.  
   Just store the special font file somewhere and create Joplin-wide stylesheet from Tools &gt; Options &gt; Appearance &gt; Custom stylesheet for Joplin-wide app styles[^2].  
-  For example, if you saved the special font as /home/username/share/fonts/NoLSEP.ttf and want to use IPAGothic as the custom editor font, the stylesheet should look like this.
+  For example, if you saved the special font as /home/username/share/fonts/NoLSEP.ttf and want to use IPAGothic as the custom editor font, the stylesheet should look like this[^3].
   ```
   @font-face {
       font-family: NoLSEP;
@@ -97,8 +97,9 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
   > Because this style is placed AFTER the Joplin-wide styles, you have to give more score to the font-family spec in the Joplin-wide style.
   > I changed selector from '.ace_editor' to 'div.ace_editor' for this.
   
-[^1]: Before the Joplin-wide stylesheet was implemented in v1.0.176, I had been using a [small patch](/misc/joplin_multi_editor_fonts.patch) to make "Editor font family" accept multiple fonts separated by comma.
+[^1]: Before the Joplin-wide stylesheet was implemented in v1.0.176, I had been using a [small patch](/misc/joplin_multi_editor_fonts.patch) to make "Editor font family" accept multiple fonts separated by comma, just for this purpose.
 [^2]: The menu creates and edits ~/.config/joplin-desktop/userchrome.css.
+[^3]: As NoLSEP font is used only for this specific purpose, I didn't want to install it in the system-wide directory such as /usr/local/share/fonts/TTF. So I put it under my home directory and defined @font-face rule to use it.
 
 ## References
 * Joplin  
