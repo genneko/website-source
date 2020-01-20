@@ -1,6 +1,7 @@
 ---
 title: "How to use Joplin desktop app on FreeBSD"
 date: 2020-01-15T20:26:00+09:00
+lastmod: 2020-01-21T06:31:00+09:00
 draft: false
 tags: [ "application", "installation", "freebsd", "font" ]
 toc: true
@@ -10,7 +11,7 @@ This is a quick note on how I build and use the latest Joplin desktop app on Fre
 For my initial exploration of Joplin on FreeBSD, please refer to the [previous post](/playing-with-bsd/application/joplin-on-freebsd).
 
 ## Target Version
-The current target version of this article is Joplin Electron (pre-)release v1.0.177 (Dec 2019).
+The current target version of this article is Joplin Electron release v1.0.178 (Jan 2020).
 ![Joplin Version](/images/howto-use-joplin-on-freebsd/JoplinVersion.png)
 
 ## Building Joplin
@@ -119,4 +120,4 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 
 ## Revision History
 * 2020-01-15: Created
-
+* 2020-01-20: Updated the target version to 1.0.178
