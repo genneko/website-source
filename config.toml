@@ -16,6 +16,11 @@ pluralizelisttitles = false
 canonifyurls = true
 #enableGitInfo = true
 
+[markup]                                                                        
+  [markup.goldmark]                                                             
+    [markup.goldmark.renderer]                                                  
+      unsafe = true
+
 [privacy]
   [privacy.googleAnalytics]
     anonymizeIP = true
