@@ -13,38 +13,38 @@ Although it's quite late, I tried to install 12.0-RC3 on a host behind a HTTP pr
 2. Go into Shell at the Welcome dialog.
 
 3. Select an appropriate keymap for my keyboard.
-```
-kbdcontrol -l jp
-```
+   ```
+   kbdcontrol -l jp
+   ```
 
 4. Set the http_proxy environment variable to let installer fetch distribution sets (tarballs) via proxy.
-```
-export http_proxy=proxyhost:3128
-```
+   ```
+   export http_proxy=proxyhost:3128
+   ```
 
 5. Run the standard installer program 'bsdinstall' and proceed to disk partitioning screen.
-```
-bsdinstall
-```
+   ```
+   bsdinstall
+   ```
 
 6. Just before hitting OK at the "Last chance!" confirmation dialog, press [Alt] + [F4] to open a console and set up IP and DNS configurations. 
-If a DHCP server is available, the easiest way is to run the following command.
-```
-dhclient em0
-```
-If not, manually configure IP address with ifconfig and add nameserver lines to /tmp/bsdinstall_etc/resolv.conf (symlinked to /etc/resolv.conf). 
-It's might be something like:
-```
-ifconfig em0 inet 10.0.2.15/24
-route add default 10.0.2.2
-echo nameserver 192.168.10.1 > /tmp/bsdinstall_etc/resolv.conf
-```
+   If a DHCP server is available, the easiest way is to run the following command.
+   ```
+   dhclient em0
+   ```
+   If not, manually configure IP address with ifconfig and add nameserver lines to /tmp/bsdinstall_etc/resolv.conf (symlinked to /etc/resolv.conf). 
+   It's might be something like:
+   ```
+   ifconfig em0 inet 10.0.2.15/24
+   route add default 10.0.2.2
+   echo nameserver 192.168.10.1 > /tmp/bsdinstall_etc/resolv.conf
+   ```
 
 7. Go back to the installer screen with [Alt] + [F1] and go on.
 
 8. Before exiting the installer, I usually ran the following commands in chrooted shell to rearrange ZFS dataset to use true /home instead of /usr/home symlinked to /home.
-```
-zfs rename zroot/usr/home zroot/home
-zfs set mountpoint=/home zroot/home
-rm /home
-```
+   ```
+   zfs rename zroot/usr/home zroot/home
+   zfs set mountpoint=/home zroot/home
+   rm /home
+   ```

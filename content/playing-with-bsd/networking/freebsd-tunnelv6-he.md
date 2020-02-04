@@ -115,9 +115,9 @@ Now the IPv6 tunnel is up, I have to set up rtadvd and dhcpd6 to selectively aut
       :pinfoflags="l":vltime#600:pltime#300:\
       :rdnss="2001:db8:2:beef::3,2001:db8:2:beef::5":
     ```    
-`raflags="mo"` sets Managed Configuration(M) and Other Configuration(O) flags in RA. Those flags notify receiving hosts that they may be able to get address and other information from DHCPv6 server.  
-`noifprefix`, `addr="2001:db8:2:beef::` and `prefixlen#64` explicitly instruct rtadvd to advertise the routed/64 prefix '2001:db8:2:beef::/64'.  
-`pinfoflags="l"` tells rtadvd to set only On-Link(L) flag in prefix information's flags field. By default, Autonomous(A) flag is also set but I remove it because I don't want hosts to autoconfigure their IPv6 address with RA.
+   `raflags="mo"` sets Managed Configuration(M) and Other Configuration(O) flags in RA. Those flags notify receiving hosts that they may be able to get address and other information from DHCPv6 server.  
+   `noifprefix`, `addr="2001:db8:2:beef::` and `prefixlen#64` explicitly instruct rtadvd to advertise the routed/64 prefix '2001:db8:2:beef::/64'.  
+   `pinfoflags="l"` tells rtadvd to set only On-Link(L) flag in prefix information's flags field. By default, Autonomous(A) flag is also set but I remove it because I don't want hosts to autoconfigure their IPv6 address with RA.
 
 2. Install the ISC-DSCP-Server and create /usr/local/etc/dhcpd6.conf.  
 Here I configure so that only a single host 'pc1' can get a statically configured IPv6 address (and DNS server addresses).

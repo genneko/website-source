@@ -54,9 +54,9 @@ Oh wait! Another zroot? Where does it come from?
 3. The previous command doesn't tell me where the pool resides.  
 I disconnect the USB disk and ran ``zpool import`` again.  
 This time it didn't show any pool. So the pool must be on the disk (da4).
-```
-$ sudo zpool import
-```
+   ```
+   $ sudo zpool import
+   ```
 
 4. Then I examined ZFS label information on the disk with ``zdb -l``.  
 First, I ran the command on the whole disk (/dev/da4) but no label was found.

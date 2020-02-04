@@ -83,7 +83,7 @@ This is because the GPT secondary metadata is no longer located at the end of th
           2048  419426304      2  freebsd-zfs  (200G)
      419428352       2008         - free -  (1.0M)
    ```
-Run the following command to fix this by using the primary metadata at the beginning of the disk.  
+   Run the following command to fix this by using the primary metadata at the beginning of the disk.  
    ```
    # gpart recover vtbd0
    # gpart show

@@ -48,60 +48,60 @@ Install WireGuard App (Beta) from Google Play.
 ## Configure WireGuard
 ### FreeBSD
 1. Generate private/public key pairs for FreeBSD and Android.
-	```
-	sudo su
-	cd /usr/local/etc/wireguard
-	wg genkey > freebsd.private
-	wg pubkey < freebsd.private > freebsd.public
-	wg genkey > android.private
-	wg pubkey < android.private > android.public
-	```
+   ```
+   sudo su
+   cd /usr/local/etc/wireguard
+   wg genkey > freebsd.private
+   wg pubkey < freebsd.private > freebsd.public
+   wg genkey > android.private
+   wg pubkey < android.private > android.public
+   ```
 
 2. Create a configuration file for the server (FreeBSD).
-	```
-	vi wg0.conf
-	```
+   ```
+   vi wg0.conf
+   ```
 
-	[wg0.conf]
-	```
-	[Interface]
-	Address = 192.168.222.1/32
-	PrivateKey = <content of freebsd.private>
-	ListenPort = 51820
-	
-	[Peer]
-	PublicKey = <content of android.public>
-	AllowedIPs = 192.168.222.2/32
-	```
+   [wg0.conf]
+   ```
+   [Interface]
+   Address = 192.168.222.1/32
+   PrivateKey = <content of freebsd.private>
+   ListenPort = 51820
+   
+   [Peer]
+   PublicKey = <content of android.public>
+   AllowedIPs = 192.168.222.2/32
+   ```
 
 3. Create a configuration file for the client (Android).
-	```
-	vi android.conf
-	```
+   ```
+   vi android.conf
+   ```
 
-	[android.conf]
-	```
-	[Interface]
-	Address = 192.168.222.2/32
-	PrivateKey = <content of android.private>
-	
-	[Peer]
-	PublicKey = <content of freebsd.public>
-	AllowedIPs = 192.168.222.1/32
-	Endpoint = wg.example.com:51820
-	```
+   [android.conf]
+   ```
+   [Interface]
+   Address = 192.168.222.2/32
+   PrivateKey = <content of android.private>
+   
+   [Peer]
+   PublicKey = <content of freebsd.public>
+   AllowedIPs = 192.168.222.1/32
+   Endpoint = wg.example.com:51820
+   ```
 
 4. Start WireGuard service on the server.
-	```
-	sysrc wireguard_enable="YES"
-	sysrc wireguard_interfaces="wg0"
-	service wireguard start
-	```
+   ```
+   sysrc wireguard_enable="YES"
+   sysrc wireguard_interfaces="wg0"
+   service wireguard start
+   ```
 
 5. Display a QR code representing the Android configuration.
-	```
-	qrencode -t ansi < android.conf
-	```
+   ```
+   qrencode -t ansi < android.conf
+   ```
 
 ### Android
 1. Start WireGuard app.

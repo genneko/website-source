@@ -592,8 +592,8 @@ gateway_enable="YES"
 ipv6_gateway_enable="YES"
 ```
 
-#### Separate Network Configuration
-This is an example configuration for five VNET jails in a network separated from the host. I used this configuration to experiment network software such as WireGuard VPN (see [this article](/playing-with-bsd/networking/freebsd-wireguard-quicklook)).
+#### Isolated Network Configuration
+This is an example configuration for five VNET jails in a network isolated from the host. I used this configuration to experiment network software such as WireGuard VPN (see [this article](/playing-with-bsd/networking/freebsd-wireguard-quicklook)).
 
 In this configuration, one jail acts as a central router which crudely emulates a public network and is to be used as a monitoring post running tcpdump, two are routers on private sites and remaining two are hosts on the private sites.
 
@@ -784,33 +784,33 @@ Because the jails in this configuration cannot access outside network, ``pkg ins
 I use the following procedures.
 
 1. Download package files on the host.  
-With -d option, ``pkg fetch`` downloads the specified package plus its dependencies.  
-Downloaded files are stored in the host's /var/cache/pkg.
-```
-pkg fetch -d wireguard
-```
+   With -d option, ``pkg fetch`` downloads the specified package plus its dependencies.  
+   Downloaded files are stored in the host's /var/cache/pkg.
+   ```
+   pkg fetch -d wireguard
+   ```
 
 2. Make the downloaded package files available to jails.  
-Although you can simply copy the files to jails' filesystem but nullfs mount /var/cache/pkg is much better and easier.  
-The following line in /etc/jail.conf achieves this.  The host's /var/cache/pkg is mounted on the jails' /mnt directory.
-```
-mount = "/var/cache/pkg /vm/${name}/mnt nullfs ro 0 0";
-```
+   Although you can simply copy the files to jails' filesystem but nullfs mount /var/cache/pkg is much better and easier.  
+   The following line in /etc/jail.conf achieves this.  The host's /var/cache/pkg is mounted on the jails' /mnt directory.
+   ```
+   mount = "/var/cache/pkg /vm/${name}/mnt nullfs ro 0 0";
+   ```
 
 3. Start the jails and install the package from the host.  
-```
-pkg -j vpnr1 add /mnt/wireguard-0.0.20181218.txz
-[vpnr1] Installing wireguard-0.0.20181218...
-[vpnr1] `-- Installing bash-4.4.23_1...
-[vpnr1] |   `-- Installing gettext-runtime-0.19.8.1_2...
-[vpnr1] |   | `-- Installing indexinfo-0.3.1...
-[vpnr1] |   | `-- Extracting indexinfo-0.3.1: 100%
-[vpnr1] |   `-- Extracting gettext-runtime-0.19.8.1_2: 100%
-[vpnr1] `-- Extracting bash-4.4.23_1: 100%
-[vpnr1] `-- Installing wireguard-go-0.0.20181222...
-[vpnr1] `-- Extracting wireguard-go-0.0.20181222: 100%
-[vpnr1] Extracting wireguard-0.0.20181218: 100%
-```
+   ```
+   pkg -j vpnr1 add /mnt/wireguard-0.0.20181218.txz
+   [vpnr1] Installing wireguard-0.0.20181218...
+   [vpnr1] `-- Installing bash-4.4.23_1...
+   [vpnr1] |   `-- Installing gettext-runtime-0.19.8.1_2...
+   [vpnr1] |   | `-- Installing indexinfo-0.3.1...
+   [vpnr1] |   | `-- Extracting indexinfo-0.3.1: 100%
+   [vpnr1] |   `-- Extracting gettext-runtime-0.19.8.1_2: 100%
+   [vpnr1] `-- Extracting bash-4.4.23_1: 100%
+   [vpnr1] `-- Installing wireguard-go-0.0.20181222...
+   [vpnr1] `-- Extracting wireguard-go-0.0.20181222: 100%
+   [vpnr1] Extracting wireguard-0.0.20181218: 100%
+   ```
 
 ## References
 * FreeBSD Handbook: Jails  
@@ -855,7 +855,7 @@ https://gist.github.com/dlangille/ce60ac76b69f267a3f1de33495a338fc
 ## Revision History
 * 2018-10-07: Created
 * 2018-12-14: Add a note on FreeBSD 12.0
-* 2019-01-19: Add "Separate Network Configuration" to "VNET Jails"
+* 2019-01-19: Add "Isolated Network Configuration" to "VNET Jails"
 * 2019-10-13: Update the procedure to run "freebsd-update upgrade" on jails
 * 2019-10-25: Add an optional "change jail's root prompt" step to "Creating a Template"
 * 2020-01-13: Add periodic.conf and enable cron in jails.
