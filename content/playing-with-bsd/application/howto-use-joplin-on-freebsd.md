@@ -22,7 +22,7 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
    So I downloaded and installed the latest Electron7 package from the following pre-official GitHub repository.  
    https://github.com/tagattie/FreeBSD-Electron/releases
    ```
-   cd ~/tmp
+   cd ~/Downloads
    fetch https://github.com/tagattie/FreeBSD-Electron/releases/download/v7.1.11/electron7-7.1.11-freebsd12-amd64.txz
    sudo pkg install electron7-7.1.11-freebsd12-amd64.txz
    ```
