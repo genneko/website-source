@@ -1,7 +1,7 @@
 ---
 title: "How to use Joplin desktop app on FreeBSD"
 date: 2020-01-15T20:26:00+09:00
-lastmod: 2020-02-09T12:19:00+09:00
+lastmod: 2020-02-09T12:43:00+09:00
 draft: false
 tags: [ "application", "installation", "freebsd", "font" ]
 toc: true
@@ -33,6 +33,7 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
    cd /usr/local/share
    sudo ln -s electron7 electron
    ```
+   > I had continued to use electron6 for a while even after Joplin switched to electron7, but it looked like the app ceased working correctly on v1.0.179 or later versions so I finally moved to electron7.
 
    Other dependencies can be installed from the FreeBSD's official packages.  
    ```
