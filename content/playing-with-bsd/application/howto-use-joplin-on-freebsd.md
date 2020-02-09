@@ -1,7 +1,7 @@
 ---
 title: "How to use Joplin desktop app on FreeBSD"
 date: 2020-01-15T20:26:00+09:00
-lastmod: 2020-01-21T06:31:00+09:00
+lastmod: 2020-02-09T12:19:00+09:00
 draft: false
 tags: [ "application", "installation", "freebsd", "font" ]
 toc: true
@@ -11,17 +11,33 @@ This is a quick note on how I build and use the latest Joplin desktop app on Fre
 For my initial exploration of Joplin on FreeBSD, please refer to the [previous post](/playing-with-bsd/application/joplin-on-freebsd).
 
 ## Target Version
-The current target version of this article is Joplin Electron release v1.0.178 (Jan 2020).
+The current target version of this article is Joplin Electron release v1.0.184 (Feb 2020).
 ![Joplin Version](/images/howto-use-joplin-on-freebsd/JoplinVersion.png)
 
 ## Building Joplin
 I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE system (with XFCE4 desktop).
 
 1. Install dependencies such as Electron and Nodejs.  
+   The latest Joplin requires Electron7 but it's not yet officially available in the FreeBSD ports tree.  
+   So I downloaded and installed the latest Electron7 package from the following pre-official GitHub repository.  
+   https://github.com/tagattie/FreeBSD-Electron/releases
    ```
-   sudo pkg install electron6 node10 npm-node10 python
+   cd ~/tmp
+   fetch https://github.com/tagattie/FreeBSD-Electron/releases/download/v7.1.11/electron7-7.1.11-freebsd12-amd64.txz
+   sudo pkg install electron7-7.1.11-freebsd12-amd64.txz
    ```
-> The latest Joplin uses Electron7 but it's not yet available in the FreeBSD ports tree. Thus I use Electron6 here and haven't found any problem so far.  
+   Then I created symbolic links for compatibility.  
+   ```
+   cd /usr/local/bin
+   sudo ln -s electron7 electron
+   cd /usr/local/share
+   sudo ln -s electron7 electron
+   ```
+
+   Other dependencies can be installed from the FreeBSD's official packages.  
+   ```
+   sudo pkg install node10 npm-node10 python
+   ```
 
 2. Clone my forked version of Joplin and switch to electron_freebsd branch, which includes some modifications for FreeBSD.
    ```
@@ -109,6 +125,9 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 * GitHub: laurent22/joplin  
 <https://github.com/laurent22/joplin>
 
+* GitHub: tagattie/FreeBSD-Electron  
+<https://github.com/tagattie/FreeBSD-Electron>
+
 * GitHub: genneko/joplin  
 <https://github.com/genneko/joplin>
 
@@ -121,3 +140,4 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 ## Revision History
 * 2020-01-15: Created
 * 2020-01-20: Updated the target version to 1.0.178
+* 2020-02-09: Updated the target version to 1.0.184 (Use pre-official electron7 package)
