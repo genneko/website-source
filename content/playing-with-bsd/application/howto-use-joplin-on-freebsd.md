@@ -1,7 +1,7 @@
 ---
 title: "How to use Joplin desktop app on FreeBSD"
 date: 2020-01-15T20:26:00+09:00
-lastmod: 2020-02-09T12:43:00+09:00
+lastmod: 2020-02-23T09:30:00+09:00
 draft: false
 tags: [ "application", "installation", "freebsd", "font" ]
 toc: true
@@ -11,7 +11,7 @@ This is a quick note on how I build and use the latest Joplin desktop app on Fre
 For my initial exploration of Joplin on FreeBSD, please refer to the [previous post](/playing-with-bsd/application/joplin-on-freebsd).
 
 ## Target Version
-The current target version of this article is Joplin Electron release v1.0.184 (Feb 2020).
+The current target version of this article is Joplin Electron release v1.0.185 (Feb 2020).
 ![Joplin Version](/images/howto-use-joplin-on-freebsd/JoplinVersion.png)
 
 ## Building Joplin
@@ -37,7 +37,7 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
 
    Other dependencies can be installed from the FreeBSD's official packages.  
    ```
-   sudo pkg install node10 npm-node10 python
+   sudo pkg install node10 npm-node10 python vips
    ```
 
 2. Clone my forked version of Joplin and switch to electron_freebsd branch, which includes some modifications for FreeBSD.
@@ -50,12 +50,11 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
 
 3. Build the desktop (Electron) application by mostly following the [original build instruction](https://github.com/laurent22/joplin/blob/master/BUILD.md#building-the-electron-application).
    ```
-   npm install && cd Tools && npm install && cd ..
-   npm run copyLib
-   npm run tsc
-   cd ElectronClient/app
    npm install
+   cd ElectronClient
+   npm run build
    ```
+   > I use ``npm run build`` instead of ``npm run start`` because it looks like the latter doesn't expect I'm using the globally installed electron.
 
 4. Now you can run the app by running the following command  
    ```
@@ -63,7 +62,7 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
    ```
    or by running a script included in my fork
    ```
-   ../joplin-desktop
+   ./joplin-desktop
    ```
 
 ## Workaround for LSEP showing up in CJK input methods
@@ -142,3 +141,4 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 * 2020-01-15: Created
 * 2020-01-20: Updated the target version to 1.0.178
 * 2020-02-09: Updated the target version to 1.0.184 (Use pre-official electron7 package)
+* 2020-02-23: Updated the target version to 1.0.185 (Build steps were changed)
