@@ -1,7 +1,7 @@
 ---
 title: "How to use Joplin desktop app on FreeBSD"
 date: 2020-01-15T20:26:00+09:00
-lastmod: 2020-03-04T20:25:00+09:00
+lastmod: 2020-03-25T18:22:00+09:00
 draft: false
 tags: [ "application", "installation", "freebsd", "font" ]
 toc: true
@@ -99,6 +99,12 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
   }
   ```
   > NOTE  
+  > For Windows, the font's path would be something like:
+  > ```
+  > file:///C:/Users/username/share/fonts/NoLSEP.ttf
+  > ```
+
+  > NOTE  
   > By default, Joplin uses the following style for its editor.
   > ```
   > .ace_editor * {
@@ -143,3 +149,4 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 * 2020-02-09: Updated the target version to 1.0.184 (Use pre-official electron7 package)
 * 2020-02-23: Updated the target version to 1.0.185 (Build steps were changed)
 * 2020-03-04: Updated the target version to 1.0.187
+* 2020-03-25: Add a note on Windows file path
