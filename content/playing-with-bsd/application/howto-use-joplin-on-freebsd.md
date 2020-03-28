@@ -1,7 +1,7 @@
 ---
 title: "How to use Joplin desktop app on FreeBSD"
 date: 2020-01-15T20:26:00+09:00
-lastmod: 2020-03-25T18:22:00+09:00
+lastmod: 2020-03-28T14:22:00+09:00
 draft: false
 tags: [ "application", "installation", "freebsd", "font" ]
 toc: true
@@ -87,7 +87,8 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 * If you are using a custom editor font, you cannot specify the special font in "Editor font family" because it can take only a single font name thus overrides the custom font.  
   But if you have Joplin [v1.0.176](https://github.com/laurent22/joplin/releases/tag/v1.0.176) or later[^1], you can use the Joplin-wide stylesheet to work around this issue while you continue to use the custom editor font.  
   Just store the special font file somewhere and create Joplin-wide stylesheet from Tools &gt; Options &gt; Appearance &gt; Custom stylesheet for Joplin-wide app styles[^2].  
-  For example, if you saved the special font as /home/username/share/fonts/NoLSEP.ttf and want to use IPAGothic as the custom editor font, the stylesheet should look like this[^3].
+  For example, if you saved the special font as /home/username/share/fonts/NoLSEP.ttf and want to use IPAGothic as the custom editor font, the stylesheet should look like this[^3].  
+  **Make sure to restart Joplin** after saving the stylesheet. Changes in the stylesheet have no effect until you restart Joplin. See the [official page](https://github.com/laurent22/joplin#custom-css) for more details.    
   ```
   @font-face {
       font-family: NoLSEP;
@@ -150,3 +151,4 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 * 2020-02-23: Updated the target version to 1.0.185 (Build steps were changed)
 * 2020-03-04: Updated the target version to 1.0.187
 * 2020-03-25: Add a note on Windows file path
+* 2020-03-28: Add a note on restarting Joplin after editing the custom stylesheet.
