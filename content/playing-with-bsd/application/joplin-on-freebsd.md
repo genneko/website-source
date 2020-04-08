@@ -49,7 +49,7 @@ According to the [Joplin website](https://joplinapp.org#installation), three typ
 At first glance, none of them seem to support FreeBSD.  
 Building the Electron-based desktop app on FreeBSD looks very hard to me, though I recently heard about the progress of Electron on FreeBSD.  
 
-_2019-06-23: I added a [new section] (#desktop-application) on running the desktop app on FreeBSD!_
+_2019-06-23: I added a [new section](#desktop-application) on running the desktop app on FreeBSD!_
 
 On the other hand, the terminal app seems to have at least minimal support for FreeBSD as the [issue #867](https://github.com/laurent22/joplin/issues/867) indicates, so I decided to start with the terminal app.
 
