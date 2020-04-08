@@ -61,7 +61,7 @@ In this configuration,  jail r1 acts as a central router which crudely emulates 
 
 I planned to run WireGuard on vpnr1 and vpnr2 and build a VPN tunnel between site1 and site2.
 
-For details on jails configuration, please refer to [another post](/playing-with-bsd/system/learning-notes-on-jails/#separate-network-configuration).  
+For details on jails configuration, please refer to [another post](/playing-with-bsd/system/learning-notes-on-jails/#isolated-network-configuration).  
 The following sections assume that all five jails are up and running.
 
 ### Install WireGuard
