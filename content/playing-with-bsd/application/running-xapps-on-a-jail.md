@@ -9,7 +9,7 @@ FreeBSD jails are often talked about from a security or system administration pe
 Although it's a perfectly valid point of view, jails can also be used for other purposes.
 
 In fact, just recently I benefited from a jail in such a situation.  
-It once again convinced me that jails were really awesome and I'd like to write up this short article.
+It once again convinced me that jails were really awesome and made me write up this short article.
 
 ## Assumptions
 * The host is a [graphical desktop workstation](/playing-with-bsd/hardware/freebsd-on-thinkpad-t480/) running FreeBSD 12.1/amd64 on ZFS.
