@@ -1,7 +1,7 @@
 ---
 title: "How to use Joplin desktop app on FreeBSD"
 date: 2020-01-15T20:26:00+09:00
-lastmod: 2020-04-12T08:39:00+09:00
+lastmod: 2020-04-12T22:21:00+09:00
 draft: false
 tags: [ "application", "installation", "freebsd", "font" ]
 toc: true
@@ -11,8 +11,8 @@ This is a quick note on how I build and use the latest Joplin desktop app on Fre
 For my initial exploration of Joplin on FreeBSD, please refer to the [previous post](/playing-with-bsd/application/joplin-on-freebsd).
 
 ## Target Version
-The current target version of this article is Joplin Electron release v1.0.199 (Apr 2020).  
-I confirmed that the app could be built using my fork at the tag [freebsd-20200412](https://github.com/genneko/joplin/releases/tag/freebsd-20200412).
+The current target version of this article is Joplin Electron release v1.0.200 (Apr 2020).  
+I confirmed that the app could be built using my fork at the tag [freebsd-20200412a](https://github.com/genneko/joplin/releases/tag/freebsd-20200412a).
 ![Joplin Version](/images/howto-use-joplin-on-freebsd/JoplinVersion.png)
 
 ## Building Joplin
@@ -44,9 +44,9 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
    ```
    > **NOTE**  
    > If the head of the branch cannot be built (it occurs from time to time), please try the tagged version which I confirmed to be built.  
-   > As of 12 April 2020, the latest confirmed tag is [freebsd-20200412](https://github.com/genneko/joplin/releases/tag/freebsd-20200412) and it can be checked out as follows:  
+   > As of 12 April 2020, the latest confirmed tag is [freebsd-20200412a](https://github.com/genneko/joplin/releases/tag/freebsd-20200412a) and it can be checked out as follows:  
    > ```
-   > git checkout freebsd-20200412
+   > git checkout freebsd-20200412a
    > ```
 
 3. Build the desktop (Electron) application by mostly following the [original build instruction](https://github.com/laurent22/joplin/blob/master/BUILD.md#building-the-electron-application).
@@ -154,3 +154,4 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 * 2020-03-25: Add a note on Windows file path
 * 2020-03-28: Add a note on restarting Joplin after editing the custom stylesheet.
 * 2020-04-12: Updated the target version to 1.0.199 and add a few notes
+* 2020-04-12: Updated the target version to 1.0.200.
