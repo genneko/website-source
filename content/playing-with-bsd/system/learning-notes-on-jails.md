@@ -1,7 +1,7 @@
 ---
 title: "Learning Notes on FreeBSD Jails"
 date: 2018-10-07T18:35:49+09:00
-lastmod: 2020-01-13T22:45:00+09:00
+lastmod: 2020-04-24T10:21:00+09:00
 draft: false
 tags: [ "freebsd", "jail", "virtualization", "administration" ]
 toc: true
@@ -49,7 +49,8 @@ Here I'm going to create a FreeBSD 11.2 template in /vm/tmpl/11.2.
    ```
 
 4. Copy timezone configuration from the host to the template.  
-Usually /etc/resolv.conf is also copied from the host, but after some experiments I decided to copy it by using /etc/jail.conf's exec.prestart and delete it by exec.poststop.
+Usually /etc/resolv.conf is also copied from the host, but after some experiments I decided to copy it by using /etc/jail.conf's exec.prestart and delete it by exec.poststop for most cases.  
+(But I won't do this if the host acts as a name server and its resolv.conf refers to itself. In such a case, I'll use a statically configured resolv.conf for jails)
 
    ```
    sudo cp /etc/localtime /vm/tmpl/11.2/etc/
@@ -67,6 +68,7 @@ Usually /etc/resolv.conf is also copied from the host, but after some experiment
    sendmail_outbound_enable="NO"
    sendmail_msp_queue_enable="NO"
    syslogd_flags="-ss"
+   cron_flags="-J 60"
    ```
 
 6. Edit system crontab in the template to disable adjkern.  
@@ -859,3 +861,4 @@ https://gist.github.com/dlangille/ce60ac76b69f267a3f1de33495a338fc
 * 2019-10-13: Update the procedure to run "freebsd-update upgrade" on jails
 * 2019-10-25: Add an optional "change jail's root prompt" step to "Creating a Template"
 * 2020-01-13: Add periodic.conf and enable cron in jails.
+* 2020-04-24: Add words on resolv.conf and add cron_flags to rc.conf.
