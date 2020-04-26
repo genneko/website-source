@@ -9,6 +9,8 @@ After playing briefly with WireGuard (See [previous post](/playing-with-bsd/netw
 
 _NOTE: WireGuard is still in early stage of development. Android app is clearly marked with beta and Go-implementation (wireguard-go) has no official release yet. This article just shows you what I did to take a look at it._
 
+2020-04-26: I wrote a [new post](/playing-with-bsd/networking/freebsd-wireguard-jail) on building a WireGuard jail with the FreeBSD's standard tools.
+
 ## Network Configuration
 * FreeBSD - WireGuard Server.  
 I setup a FreeBSD 11.2 droplet (VPS) on DigitalOcean for this experiment. Using wireguard and wireguard-go packages.  

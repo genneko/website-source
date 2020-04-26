@@ -17,6 +17,8 @@ _NOTE: WireGuard is still in early stage of development. Go-implementation (wire
 
 2019-01-26: Added a [new section](#remote-access-host-to-site-configuration) on testing remote-access (host-to-site) by a roaming client.
 
+2020-04-26: I wrote a [new post](/playing-with-bsd/networking/freebsd-wireguard-jail) on building a WireGuard jail with the FreeBSD's standard tools.
+
 ## Prerequisite
 * FreeBSD 12.0/amd64
 * Generic kernel (finally with VIMAGE enabled)
