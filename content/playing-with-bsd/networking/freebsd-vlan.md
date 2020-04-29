@@ -246,7 +246,7 @@ The host has only the em0 configured while the switch has all VLANs and IP addre
    jexec v101 ifconfig epair101a 192.168.10.11/24
    jexec v102 ifconfig epair102a 192.168.10.12/24
    jexec v201 ifconfig epair201a 192.168.20.11/24
-   
+   jexec v202 ifconfig epair202a 192.168.20.12/24
    jexec v301 ifconfig epair301a 192.168.30.11/24
    jexec v302 ifconfig epair302a 192.168.30.12/24
    ```
