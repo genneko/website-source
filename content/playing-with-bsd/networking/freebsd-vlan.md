@@ -320,6 +320,34 @@ If you do this, ARP resolutions on the tagged interfaces seem to cease working a
 - [FreeBSD Forum: VNET ARP replies are lost](https://forums.freebsd.org/threads/vnet-arp-replies-are-lost.71082/)
 - [FreeBSD Forum: Bridge/epair not passing through tagged VLAN traffic between host and VNET jail](https://forums.freebsd.org/threads/bridge-epair-not-passing-through-tagged-vlan-traffic-between-host-and-vnet-jail.71646/)
 
+### Use Another FreeBSD Host to Emulate the Switch
+If you don't have a switch at hand, you can setup another FreeBSD host to emulate it for the testing purpose.
+
+A minimal configuration for the second host to act like a simple layer 3 switch (or more exactly a router capable of handling VLAN tags).
+```
+cloned_interfaces="em0.10 em0.20 em0.30"
+ifconfig_em0="192.168.1.2/24"
+ifconfig_em0_10="inet 192.168.10.2/24"
+ifconfig_em0_20="inet 192.168.20.2/24"
+ifconfig_em0_30="inet 192.168.30.2/24"
+gateway_enable="YES"
+```
+
+If the host has multiple physical interfaces, it can be more like a switch.
+```
+cloned_interfaces="bridge10 bridge20 bridge30 em0.10 em0.20 em0.30"
+ifconfig_em0="192.168.1.2/24"
+ifconfig_em0_10="up"
+ifconfig_em0_20="up"
+ifconfig_em0_30="up"
+ifconfig_em1="up"
+ifconfig_em2="up"
+ifconfig_em3="up"
+ifconfig_bridge10="inet 192.168.10.2/24 addm em0.10 addm em1 up"
+ifconfig_bridge20="inet 192.168.20.2/24 addm em0.20 addm em2 up"
+ifconfig_bridge30="inet 192.168.30.2/24 addm em0.30 addm em3 up"
+gateway_enable="YES"
+```
 
 ## References
 * FreeBSD Handbook: VLANs  
