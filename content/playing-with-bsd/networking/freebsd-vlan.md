@@ -51,8 +51,8 @@ Here are some notes and assumptions.
   - vlan 30 - 192.168.30.2
 
 - The host has only a single IP address (192.168.1.1) on em0.  
-  It cannot reach the jails directly because it doesn't have any address in the jail's subnet.
-  Assigning IP addresses on the bridge interfaces lets the host access the jails directly. But in this example, the host communicates with the jalis via the switch (the host's default gateway 192.168.1.2).
+  It cannot reach the jails directly because it doesn't have any address in the jail's subnet.  
+  Instead, the host communicates with the jails via the switch (the host's default gateway 192.168.1.2).
 
 - Each vnet jail is connected to the corresponding bridge with [epair(4)](https://www.freebsd.org/cgi/man.cgi?query=epair(4)).  
   As an epair has 'a' and 'b' ends (e.g. epair0a and epair0b), I decided to attach 'b' ends ('b' for 'bridge') to bridges and 'a' ends to jails.
@@ -272,7 +272,7 @@ ifconfig bridge30 inet 192.168.30.1/24
 ![Assign IP addresses to the bridges](/images/freebsd-vlan/vlan-bridges7-s.png)
 
 ### Let the Host Route Traffic Between Jail VLANs
-At this point, the jails in different VLANs (subnets) can communicate each other but their packets have to go through the switch.  
+At this point, the jails in different VLANs (subnets) can communicate each other but their packets still have to go through the switch.  
 You can avoid the packets leaving the host by enabling the IP forwarding on the host and making it act as a router.  
 
 After assigning IP addresses to the bridges, add the following line to the host's /etc/rc.conf.
@@ -286,7 +286,7 @@ sysctl net.inet.ip.fowarding=1
 
 > __NOTE__: To route packets between the bridges (VLANs), make sure to assign IP addresses to the bridges as described in the previous section, not their member interfaces such as em0.10.
 
-Then change the default gateway for each jail from the switch's vlan address to the host's bridge interface address.
+You also have to change the default gateway for each jail from the switch's vlan address to the host's bridge interface address.
 ```
 v101 { $vif = "epair101a"; $addr = "192.168.10.11/24"; $gw = "192.168.10.1"; }
 v102 { $vif = "epair102a"; $addr = "192.168.10.12/24"; $gw = "192.168.10.1"; }
