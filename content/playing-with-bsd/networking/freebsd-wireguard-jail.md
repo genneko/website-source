@@ -34,6 +34,8 @@ Refer to [this article](/playing-with-bsd/system/learning-notes-on-jails#creatin
 ## Configure Internal Network
 I created a bridge (bridge0) for the internal jail network (192.168.20.0/24) and an epair (epair0a/b), attached the 'b' side of the epair to the bridge and assigned an IP address to the bridge.  
 Adding the IP address to the bridge0 makes it the third routed interface on the host and the address becomes the default gateway for the jail.
+
+[/etc/rc.conf]
 ```
 cloned_interfaces="bridge0 epair0"
 ifconfig_bridge0="inet 192.168.20.1/24 addm epair0b up"
@@ -47,6 +49,8 @@ In the above example, I use the bridge so that I can add more jails to the inter
 But if you need only a single jail, it's not necessary to use the bridge.  
 You can connect the jail to the host directly with the epair by using the following configuration.  
 With this config, epair0b becomes the host's third routed interface.
+
+[/etc/rc.conf]
 ```
 cloned_interfaces="epair0"
 ifconfig_epair0b="inet 192.168.20.1/24"
