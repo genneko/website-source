@@ -1,7 +1,7 @@
 ---
 title: "How to use Joplin desktop app on FreeBSD"
 date: 2020-01-15T20:26:00+09:00
-lastmod: 2020-05-02T15:59:00+09:00
+lastmod: 2020-05-13T21:35:00+09:00
 draft: false
 tags: [ "application", "installation", "freebsd", "font" ]
 toc: true
@@ -21,14 +21,18 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
 1. Install dependencies such as Electron and Nodejs.  
    Now all dependencies can be installed from the FreeBSD's official packages.  
    ```
-   sudo pkg install electron7 node12 npm-node12 python vips
+   sudo pkg install electron7 node12 npm-node12 python vips git rsync
    ```
    > **NOTE**  
-   > As the electron7 port is pretty new, you might have to switch the package repository from 'quarterly' to 'latest' to install electron7.  
+   > To use the latest electron7 package, you might have to switch the package repository from 'quarterly' to 'latest' to install electron7.  
    > Please refer to the [relevant section](https://www.freebsd.org/doc/handbook/pkgng-intro.html#quarterly-latest-branch) of the FreeBSD Handbook.
    
-   > **NOTE** (2020/5/2)   
-   > The recent update of the electron7 port to 7.2.2 seems to cause trouble.  
+   > **NOTE**  
+   > (2020/5/13 Update) It turned out not to be the 7.2.2's fault.  
+   > When the electron7 port was upgrade from 7.1.x to 7.2.2, the sqlite3 native module was not rebuilt and Joplin couldn't find a file in ElectronClient/node_modules/sqlite3/lib/binding/electron-v7.2-freebsd-x64 directory.  
+   > Rebuilding Joplin after deleting ElectronClient/node_modules/sqlite3 directory solved the problem.  
+   >
+   > (2020/5/2) The recent update of the electron7 port to 7.2.2 seems to cause trouble.  
    > Im my environment, Joplin doesn't start correctly with the version.  
    > I'm not sure what the cause is but if you have the same trouble, please try [7.1.14 on the pre-release repository](https://github.com/tagattie/FreeBSD-Electron/releases/tag/v7.1.14).
    > If your system has currently 7.1.x, you can run ``pkg lock electron7`` to lock its version.
@@ -50,7 +54,7 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
    ```
    > **NOTE**  
    > If the head of the branch cannot be built (it occurs from time to time), please try the tagged version which I confirmed to be built.  
-   > As of 16 April 2020, the latest confirmed tag is [freebsd-20200421](https://github.com/genneko/joplin/releases/tag/freebsd-20200421) and it can be checked out as follows:  
+   > As of 21 April 2020, the latest confirmed tag is [freebsd-20200421](https://github.com/genneko/joplin/releases/tag/freebsd-20200421) and it can be checked out as follows:  
    > ```
    > git checkout freebsd-20200421
    > ```
@@ -163,3 +167,4 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 * 2020-04-12: Updated the target version to 1.0.200.
 * 2020-04-16: Updated the target version to 1.0.201.
 * 2020-05-02: Added a note on electron7-7.2.2.
+* 2020-05-13: Update(Correction) to the note on electron7-7.2.2.
