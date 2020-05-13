@@ -114,7 +114,8 @@ I can think of several combinations of jail types (shared or vnet) and network c
 
 ## Afterwords
 I learned it's really easy to install X applications on a jail and use it from the host.  
-Other X applications such as xfig, xterm and so on can be also run in the same manner.
+Other X applications such as xfig, xterm, chromium, firefox[^1] and so on can be also run in the same manner.
+[^1]: You may need to specify ``--no-remote`` option to the firefox when you are also running firefox on the host. Without the option, ``ssh -CY xapp firefox`` will create another window of the host's firefox instead of the new one on the jail.
 
 Now I got another reason to love the FreeBSD jails - not the real jails, of course :P
 
