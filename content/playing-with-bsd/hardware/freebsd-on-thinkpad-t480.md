@@ -1,7 +1,7 @@
 ---
 title: "ThinkPad T480 is my new main laptop which runs FreeBSD"
 date: 2019-08-22T00:50:00+09:00
-lastmod: 2019-11-09T11:23:00+09:00
+lastmod: 2020-05-24T18:06:00+09:00
 draft: false
 tags: [ "laptop", "desktop", "xorg", "installation", "freebsd" ]
 toc: true
@@ -49,10 +49,7 @@ With FreeBSD 12.0-RELEASE + Xorg + XFCE4, I can get the following stuff working 
 - Some Windows programs can be run on WINE.
 - Windows 10 can be run on bhyve (to purchase MP3s on Amazon Music, etc).
 - LAGG Failover between Ethernet and WiFi works (Use Ethernet if it's available. Otherwise use WiFi).
-
-I haven't able to make those things work so far.
-
-- Webcam works on pwcview with webcamd and cuse.ko but isn't detected by Google Hangouts on Firefox/Chromium.
+- Webcam works on Chromium, Firefox and pwcview with webcamd and cuse.ko. It can be used for video conferencing on [Jitsi Meet](https://meet.jit.si/) and a private [jitsi-meet](https://github.com/jitsi/jitsi-meet) ([port is available](https://www.freshports.org/www/jitsi-meet)) instance.
 
 I haven't tested the following items.
 
@@ -473,6 +470,44 @@ I adjusted the device permissions with devfs.
 
 4. Now I can burn CDs with GUI programs too.
 
+### Webcam and Video Conferencing
+(Added on 2020-05-24)  
+It was a pleasant surprise to find that jitsi video conference using Firefox/Chromium just works with the help of cuse.ko and webcamd!
+
+1. Install webcamd. 
+   ```
+   sudo pkg install webcamd
+   ```
+
+2. Add a user to the webcamd group.
+   ```
+   sudo pw groupmod webcamd -m genneko
+   ```
+
+3. Configure the cuse kernel module to be loaded on boot.
+   ```
+   sudo sysrc kld_list+=cuse
+   ```
+
+4. Configure the webcamd to be started on boot.
+   ```
+   sudo sysrc webcamd_enable=YES
+   ```
+   or
+   ```
+   sudo service webcamd enable
+   ```
+
+5. Manually load the module and restart devd to start the service, or reboot the entire system.
+   ```
+   sudo kldload cuse
+   sudo service devd restart
+   ```
+   or
+   ```
+   sudo shutdown -r now
+   ```
+
 ## References
 * FreeBSD wiki: Laptops running FreeBSD  
 <https://wiki.freebsd.org/Laptops>
@@ -525,3 +560,4 @@ I adjusted the device permissions with devfs.
 * 2019-09-15: Added "Suspend/Resume"
 * 2019-09-22: Updated the OneDrive Free Client's URL
 * 2019-11-09: Added "Burning CDs"
+* 2020-05-24: Added "Webcam and Video Conferencing"
