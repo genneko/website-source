@@ -1,7 +1,7 @@
 ---
 title: "How to use Joplin desktop app on FreeBSD"
 date: 2020-01-15T20:26:00+09:00
-lastmod: 2020-05-13T21:35:00+09:00
+lastmod: 2020-06-24T18:03:00+09:00
 draft: false
 tags: [ "application", "installation", "freebsd", "font" ]
 toc: true
@@ -11,8 +11,8 @@ This is a quick note on how I build and use the latest Joplin desktop app on Fre
 For my initial exploration of Joplin on FreeBSD, please refer to the [previous post](/playing-with-bsd/application/joplin-on-freebsd).
 
 ## Target Version
-The current target version of this article is Joplin Electron release v1.0.201 (Apr 2020).  
-I confirmed that the app could be built using my fork at the tag [freebsd-20200421](https://github.com/genneko/joplin/releases/tag/freebsd-20200421).
+The current target version of this article is Joplin Electron release v1.0.224 (June 2020).  
+I confirmed that the app could be built using my fork at the tag [freebsd-20200624](https://github.com/genneko/joplin/releases/tag/freebsd-20200624).
 ![Joplin Version](/images/howto-use-joplin-on-freebsd/JoplinVersion.png)
 
 ## Building Joplin
@@ -21,29 +21,11 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
 1. Install dependencies such as Electron and Nodejs.  
    Now all dependencies can be installed from the FreeBSD's official packages.  
    ```
-   sudo pkg install electron7 node12 npm-node12 python vips git rsync
+   sudo pkg install electron7 node12 npm-node12 python vips git rsync gnome-keyring
    ```
    > **NOTE**  
-   > To use the latest electron7 package, you might have to switch the package repository from 'quarterly' to 'latest' to install electron7.  
-   > Please refer to the [relevant section](https://www.freebsd.org/doc/handbook/pkgng-intro.html#quarterly-latest-branch) of the FreeBSD Handbook.
-   
-   > **NOTE**  
-   > (2020/5/13 Update) It turned out not to be the 7.2.2's fault.  
-   > When the electron7 port was upgrade from 7.1.x to 7.2.2, the sqlite3 native module was not rebuilt and Joplin couldn't find a file in ElectronClient/node_modules/sqlite3/lib/binding/electron-v7.2-freebsd-x64 directory.  
-   > Rebuilding Joplin after deleting ElectronClient/node_modules/sqlite3 directory solved the problem.  
-   >
-   > (2020/5/2) The recent update of the electron7 port to 7.2.2 seems to cause trouble.  
-   > Im my environment, Joplin doesn't start correctly with the version.  
-   > I'm not sure what the cause is but if you have the same trouble, please try [7.1.14 on the pre-release repository](https://github.com/tagattie/FreeBSD-Electron/releases/tag/v7.1.14).
-   > If your system has currently 7.1.x, you can run ``pkg lock electron7`` to lock its version.
-   
-   Then I created symbolic links for compatibility.  
-   ```
-   cd /usr/local/bin
-   sudo ln -s electron7 electron
-   cd /usr/local/share
-   sudo ln -s electron7 electron
-   ```
+   > To use the latest versions, you might want to switch the package repository from 'quarterly' to 'latest'.  
+   > Please refer to the [relevant section](https://www.freebsd.org/doc/handbook/pkgng-intro.html#quarterly-latest-branch) of the FreeBSD Handbook for the steps.
 
 2. Clone my forked version of Joplin and switch to electron_freebsd branch, which includes some modifications for FreeBSD.
    ```
@@ -54,20 +36,21 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
    ```
    > **NOTE**  
    > If the head of the branch cannot be built (it occurs from time to time), please try the tagged version which I confirmed to be built.  
-   > As of 21 April 2020, the latest confirmed tag is [freebsd-20200421](https://github.com/genneko/joplin/releases/tag/freebsd-20200421) and it can be checked out as follows:  
+   > As of 24 June 2020, the latest confirmed tag is [freebsd-20200624](https://github.com/genneko/joplin/releases/tag/freebsd-20200624) and it can be checked out as follows:  
    > ```
-   > git checkout freebsd-20200421
+   > git checkout freebsd-20200624
    > ```
 
-3. Build the desktop (Electron) application by mostly following the [original build instruction](https://github.com/laurent22/joplin/blob/master/BUILD.md#building-the-electron-application).
+3. Build the applications by mostly following the [original build instruction](https://github.com/laurent22/joplin/blob/master/BUILD.md#building-the-electron-application).
    ```
    npm install
    cd ElectronClient
    npm run build
    ```
+   > **NOTE**  
    > I use ``npm run build`` instead of ``npm run start`` because it looks like the latter doesn't expect I'm using the globally installed electron.
 
-4. Now you can run the app by running the following command  
+4. Now you can run the desktop (Electron) app by running the following command  
    ```
    electron .
    ```
@@ -75,6 +58,23 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
    ```
    ./joplin-desktop
    ```
+   > **NOTE**  
+   > When you encounter one of the following errors, please make sure that gnome-keyring's secret service is available on your system.
+   > ```
+   > Error: The name org.freedesktop.secrets was not provided by any .service files
+   > Error: Unknown or unsupported transport 'disabled' for address 'disabled:
+   > ```
+   > You would be able to enable the service on your desktop environment's automatic startup settings.
+   > For example, on XFCE4 it can be enabled by checking "Launch GNOME services on startup" on "Settings" > "Session and Startup" > "Advanced" tab.
+   >
+   > Or if you try to run Joplin on a headless system like jail with the help of SSH X11 forwarding (as I do for testing), the easiest way seems to be running it with [dbus-run-session(1)](https://www.freebsd.org/cgi/man.cgi?query=dbus-run-session(1)) like:
+   > ```
+   > dbus-run-session -- electron7 .
+   > ```
+   > ```
+   > dbus-run-session -- ./joplin-desktop
+   > ```
+
 
 ## Workaround for LSEP showing up in CJK input methods
 
@@ -110,13 +110,13 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
       font-family: NoLSEP, IPAGothic, monospace !important;
   }
   ```
-  > NOTE  
+  > **NOTE**  
   > For Windows, the font's path would be something like:
   > ```
   > file:///C:/Users/username/share/fonts/NoLSEP.ttf
   > ```
 
-  > NOTE  
+  > **NOTE**  
   > By default, Joplin uses the following style for its editor.
   > ```
   > .ace_editor * {
@@ -156,15 +156,16 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 <https://qiita.com/RAWSEQ/items/7f9fc0fd4b3d572856ed>
 
 ## Revision History
-* 2020-01-15: Created
-* 2020-01-20: Updated the target version to 1.0.178
-* 2020-02-09: Updated the target version to 1.0.184 (Use pre-official electron7 package)
-* 2020-02-23: Updated the target version to 1.0.185 (Build steps were changed)
-* 2020-03-04: Updated the target version to 1.0.187
+* 2020-01-15: Create
+* 2020-01-20: Update the target version to 1.0.178
+* 2020-02-09: Update the target version to 1.0.184 (Use pre-official electron7 package)
+* 2020-02-23: Update the target version to 1.0.185 (Build steps were changed)
+* 2020-03-04: Update the target version to 1.0.187
 * 2020-03-25: Add a note on Windows file path
 * 2020-03-28: Add a note on restarting Joplin after editing the custom stylesheet.
-* 2020-04-12: Updated the target version to 1.0.199 and add a few notes
-* 2020-04-12: Updated the target version to 1.0.200.
-* 2020-04-16: Updated the target version to 1.0.201.
-* 2020-05-02: Added a note on electron7-7.2.2.
+* 2020-04-12: Update the target version to 1.0.199 and add a few notes
+* 2020-04-12: Update the target version to 1.0.200.
+* 2020-04-16: Update the target version to 1.0.201.
+* 2020-05-02: Add a note on electron7-7.2.2.
 * 2020-05-13: Update(Correction) to the note on electron7-7.2.2.
+* 2020-06-24: Update the target version to 1.0.224 and do some cleanup.
