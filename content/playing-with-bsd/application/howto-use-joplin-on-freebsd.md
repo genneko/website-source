@@ -1,7 +1,7 @@
 ---
 title: "How to use Joplin desktop app on FreeBSD"
 date: 2020-01-15T20:26:00+09:00
-lastmod: 2020-06-24T18:03:00+09:00
+lastmod: 2020-09-12T13:23:00+09:00
 draft: false
 tags: [ "application", "installation", "freebsd", "font" ]
 toc: true
@@ -11,8 +11,8 @@ This is a quick note on how I build and use the latest Joplin desktop app on Fre
 For my initial exploration of Joplin on FreeBSD, please refer to the [previous post](/playing-with-bsd/application/joplin-on-freebsd).
 
 ## Target Version
-The current target version of this article is Joplin Electron release v1.0.224 (June 2020).  
-I confirmed that the app could be built using my fork at the tag [freebsd-20200624](https://github.com/genneko/joplin/releases/tag/freebsd-20200624).
+The current target version of this article is Joplin Electron release v1.0.233 (Aug 2020).  
+I confirmed that the app could be built using my fork at the tag [freebsd-20200802](https://github.com/genneko/joplin/releases/tag/freebsd-20200802).
 ![Joplin Version](/images/howto-use-joplin-on-freebsd/JoplinVersion.png)
 
 ## Building Joplin
@@ -36,7 +36,7 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
    ```
    > **NOTE**  
    > If the head of the branch cannot be built (it occurs from time to time), please try the tagged version which I confirmed to be built.  
-   > As of 24 June 2020, the latest confirmed tag is [freebsd-20200624](https://github.com/genneko/joplin/releases/tag/freebsd-20200624) and it can be checked out as follows:  
+   > As of 2 Aug 2020, the latest confirmed tag is [freebsd-20200802](https://github.com/genneko/joplin/releases/tag/freebsd-20200802) and it can be checked out as follows:  
    > ```
    > git checkout freebsd-20200624
    > ```
@@ -79,6 +79,7 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
 ## Workaround for LSEP showing up in CJK input methods
 
 _**NOTE:** This is not FreeBSD-specific. But anyway, I wrote it down here for future reference._  
+_**NOTE:** (2020-09-12) The problem seems to have been resolved on Joplin v1.1.x with the editor component changed from Ace Editor to CodeMirror. You can try v1.1.1 with the tagged commit [freebsd-v1.1.1-20200912](https://github.com/genneko/joplin/releases/tag/freebsd-v1.1.1-20200912) on my fork, which is a pre-release and I haven't fully tested yet._  
 
 This issue was reported several times as below.
 * [#1210](https://github.com/laurent22/joplin/issues/1210)
@@ -169,3 +170,4 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 * 2020-05-02: Add a note on electron7-7.2.2.
 * 2020-05-13: Update(Correction) to the note on electron7-7.2.2.
 * 2020-06-24: Update the target version to 1.0.224 and do some cleanup.
+* 2020-09-12: Update the target version to 1.0.233. Also add a note on 1.1.x in the LSEP/CJK section.
