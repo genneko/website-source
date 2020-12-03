@@ -1,7 +1,7 @@
 ---
 title: "How to use Joplin desktop app on FreeBSD"
 date: 2020-01-15T20:26:00+09:00
-lastmod: 2020-09-12T13:23:00+09:00
+lastmod: 2020-12-03T12:55:00+09:00
 draft: false
 tags: [ "application", "installation", "freebsd", "font" ]
 toc: true
@@ -14,6 +14,16 @@ For my initial exploration of Joplin on FreeBSD, please refer to the [previous p
 The current target version of this article is Joplin Electron release v1.0.233 (Aug 2020).  
 I confirmed that the app could be built using my fork at the tag [freebsd-20200802](https://github.com/genneko/joplin/releases/tag/freebsd-20200802).
 ![Joplin Version](/images/howto-use-joplin-on-freebsd/JoplinVersion.png)
+
+> **NOTE (2020-09-07)**  
+> The latest Android app on Google Play cannot be used with the above Electron release (v1.0.233) due to the incompatibility of their database versions.  
+> For a workaround, I have installed an older Joplin app using the APK at the following URL and disabled the automatic update for the app.  
+> https://github.com/laurent22/joplin-android/releases/tag/android-v1.0.335
+
+> **NOTE (2020-12-03)**  
+> I found it's hard to build the recent Electron releases (v1.4.8 or later) on FreeBSD. Even if it's somehow built, I can no longer make it run correctly.  
+> So for now, the last Electron release which runs on my FreeBSD host is the one tagged [freebsd-v1.4.7-electron8-20201125](https://github.com/genneko/joplin/releases/tag/freebsd-v1.4.7-electron8-20201125). Note it requires an unofficial [electron8](https://github.com/tagattie/FreeBSD-Electron/releases/tag/v8.3.3) package instead of the FreeBSD-official electron7 package.  
+> Based on those facts, I think the best bet for FreeBSD users is the Electron v1.0.233, though the later release up to v1.4.7 can also be used.
 
 ## Building Joplin
 I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE system (with XFCE4 desktop).
@@ -171,3 +181,4 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 * 2020-05-13: Update(Correction) to the note on electron7-7.2.2.
 * 2020-06-24: Update the target version to 1.0.224 and do some cleanup.
 * 2020-09-12: Update the target version to 1.0.233. Also add a note on 1.1.x in the LSEP/CJK section.
+* 2020-12-03: Add notes on the recent versions.
