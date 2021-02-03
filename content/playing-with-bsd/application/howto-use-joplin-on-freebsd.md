@@ -1,7 +1,7 @@
 ---
 title: "How to use Joplin desktop app on FreeBSD"
 date: 2020-01-15T20:26:00+09:00
-lastmod: 2020-12-03T12:55:00+09:00
+lastmod: 2021-02-03T21:59:00+09:00
 draft: false
 tags: [ "application", "installation", "freebsd", "font" ]
 toc: true
@@ -11,31 +11,36 @@ This is a quick note on how I build and use the latest Joplin desktop app on Fre
 For my initial exploration of Joplin on FreeBSD, please refer to the [previous post](/playing-with-bsd/application/joplin-on-freebsd).
 
 ## Target Version
-The current target version of this article is Joplin Electron release v1.0.233 (Aug 2020).  
-I confirmed that the app could be built using my fork at the tag [freebsd-20200802](https://github.com/genneko/joplin/releases/tag/freebsd-20200802).
+The current target version of this article is Joplin Desktop release v1.7.10 (Jan 2021).  
+I confirmed that the app could be built using my fork at the tag [freebsd-v1.7.10-electron9-20210202](https://github.com/genneko/joplin/releases/tag/freebsd-v1.7.10-electron9-20210202).
 ![Joplin Version](/images/howto-use-joplin-on-freebsd/JoplinVersion.png)
 
-> **NOTE (2020-09-07)**  
-> The latest Android app on Google Play cannot be used with the above Electron release (v1.0.233) due to the incompatibility of their database versions.  
-> For a workaround, I have installed an older Joplin app using the APK at the following URL and disabled the automatic update for the app.  
-> https://github.com/laurent22/joplin-android/releases/tag/android-v1.0.335
-
-> **NOTE (2020-12-03)**  
-> I found it's hard to build the recent Electron releases (v1.4.8 or later) on FreeBSD. Even if it's somehow built, I can no longer make it run correctly.  
-> So for now, the last Electron release which runs on my FreeBSD host is the one tagged [freebsd-v1.4.7-electron8-20201125](https://github.com/genneko/joplin/releases/tag/freebsd-v1.4.7-electron8-20201125). Note it requires an unofficial [electron8](https://github.com/tagattie/FreeBSD-Electron/releases/tag/v8.3.3) package instead of the FreeBSD-official electron7 package.  
-> Based on those facts, I think the best bet for FreeBSD users is the Electron v1.0.233, though the later release up to v1.4.7 can also be used.
-
 ## Building Joplin
-I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE system (with XFCE4 desktop).
+I take the following steps to build Joplin desktop on my FreeBSD 12.2-RELEASE system (with XFCE4 desktop).
 
 1. Install dependencies such as Electron and Nodejs.  
-   Now all dependencies can be installed from the FreeBSD's official packages.  
+   As of 3 Feb 2021, all dependencies except electron9 can be installed from the FreeBSD's official packages.  
    ```
-   sudo pkg install electron7 node12 npm-node12 python vips git rsync gnome-keyring
+   sudo pkg install node12 npm-node12 python vips git rsync gnome-keyring gmake
    ```
    > **NOTE**  
-   > To use the latest versions, you might want to switch the package repository from 'quarterly' to 'latest'.  
+   > To use the latest software versions, you might want to switch the package repository from 'quarterly' to 'latest'.  
    > Please refer to the [relevant section](https://www.freebsd.org/doc/handbook/pkgng-intro.html#quarterly-latest-branch) of the FreeBSD Handbook for the steps.
+
+   For now, you have to install electron9 by building its port, or downloading a pre-official binary package from the following URL. (you can also get electron10 there!)  
+   https://github.com/tagattie/FreeBSD-Electron/releases
+
+   Steps to build the port are something like:  
+   ```
+   sudo portsnap fetch update
+   cd /usr/ports/devel/electron9
+   sudo make install
+   ```
+   Or install a pre-official package like:  
+   ```
+   fetch https://github.com/tagattie/FreeBSD-Electron/releases/download/v9.4.1/electron9-9.4.1-freebsd12-amd64.txz
+   sudo pkg add electron9-9.4.1-freebsd12-amd64.txz
+   ```
 
 2. Clone my forked version of Joplin and switch to electron_freebsd branch, which includes some modifications for FreeBSD.
    ```
@@ -46,23 +51,30 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
    ```
    > **NOTE**  
    > If the head of the branch cannot be built (it occurs from time to time), please try the tagged version which I confirmed to be built.  
-   > As of 2 Aug 2020, the latest confirmed tag is [freebsd-20200802](https://github.com/genneko/joplin/releases/tag/freebsd-20200802) and it can be checked out as follows:  
+   > As of 3 Feb 2021, the latest confirmed tag is [freebsd-v1.7.10-electron9-20210202](https://github.com/genneko/joplin/releases/tag/freebsd-v1.7.10-electron9-20210202) and it can be checked out as follows:  
    > ```
-   > git checkout freebsd-20200624
+   > git checkout freebsd-v1.7.10-electron9-20210202
    > ```
 
-3. Build the applications by mostly following the [original build instruction](https://github.com/laurent22/joplin/blob/master/BUILD.md#building-the-electron-application).
+3. Make a small tweak to work around the [lzma-native build failure issue](https://github.com/addaleax/lzma-native/issues/98).  
    ```
-   npm install
-   cd ElectronClient
+   mkdir ~/bin
+   ln -s /usr/local/bin/gmake ~/bin/make
+   ```
+
+4. Build the application by mostly following the [original build instruction](https://github.com/laurent22/joplin/blob/dev/BUILD.md#building-the-electron-application).
+   ```
+   PATH=~/bin:$PATH npm install
+   cd packages/app-desktop
    npm run build
    ```
    > **NOTE**  
-   > I use ``npm run build`` instead of ``npm run start`` because it looks like the latter doesn't expect I'm using the globally installed electron.
+   > - ``PATH=~/bin:$PATH`` is prepended in order to use the tweak made in the previous step.  
+   > - I use ``npm run build`` instead of ``npm start`` because it looks like the latter doesn't expect I'm using the globally installed electron.
 
 4. Now you can run the desktop (Electron) app by running the following command  
    ```
-   electron .
+   electron9 .
    ```
    or by running a script included in my fork
    ```
@@ -79,7 +91,7 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
    >
    > Or if you try to run Joplin on a headless system like jail with the help of SSH X11 forwarding (as I do for testing), the easiest way seems to be running it with [dbus-run-session(1)](https://www.freebsd.org/cgi/man.cgi?query=dbus-run-session(1)) like:
    > ```
-   > dbus-run-session -- electron7 .
+   > dbus-run-session -- electron9 .
    > ```
    > ```
    > dbus-run-session -- ./joplin-desktop
@@ -88,8 +100,7 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.1-RELEASE sy
 
 ## Workaround for LSEP showing up in CJK input methods
 
-_**NOTE:** This is not FreeBSD-specific. But anyway, I wrote it down here for future reference._  
-_**NOTE:** (2020-09-12) The problem seems to have been resolved on Joplin v1.1.x with the editor component changed from Ace Editor to CodeMirror. You can try v1.1.1 with the tagged commit [freebsd-v1.1.1-20200912](https://github.com/genneko/joplin/releases/tag/freebsd-v1.1.1-20200912) on my fork, which is a pre-release and I haven't fully tested yet._  
+_**NOTE:** The problem seems to have been resolved on Joplin v1.1.x or later with the editor component changed from Ace Editor to CodeMirror. Also, it is not FreeBSD-specific. But anyway, I wrote it down here for future reference._  
 
 This issue was reported several times as below.
 * [#1210](https://github.com/laurent22/joplin/issues/1210)
@@ -157,6 +168,9 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 * GitHub: tagattie/FreeBSD-Electron  
 <https://github.com/tagattie/FreeBSD-Electron>
 
+* GitHub: addaleax/lzma-native  
+<https://github.com/addaleax/lzma-native>
+
 * GitHub: genneko/joplin  
 <https://github.com/genneko/joplin>
 
@@ -182,3 +196,4 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 * 2020-06-24: Update the target version to 1.0.224 and do some cleanup.
 * 2020-09-12: Update the target version to 1.0.233. Also add a note on 1.1.x in the LSEP/CJK section.
 * 2020-12-03: Add notes on the recent versions.
+* 2021-02-03: Update the target version to 1.7.10.
