@@ -1,7 +1,7 @@
 ---
 title: "How to use Joplin desktop app on FreeBSD"
 date: 2020-01-15T20:26:00+09:00
-lastmod: 2021-02-03T21:59:00+09:00
+lastmod: 2021-06-30T10:41:00+09:00
 draft: false
 tags: [ "application", "installation", "freebsd", "font" ]
 toc: true
@@ -11,15 +11,15 @@ This is a quick note on how I build and use the latest Joplin desktop app on Fre
 For my initial exploration of Joplin on FreeBSD, please refer to the [previous post](/playing-with-bsd/application/joplin-on-freebsd).
 
 ## Target Version
-The current target version of this article is Joplin Desktop release v1.7.10 (Jan 2021).  
-I confirmed that the app could be built using my fork at the tag [freebsd-v1.7.10-electron9-20210202](https://github.com/genneko/joplin/releases/tag/freebsd-v1.7.10-electron9-20210202).
+The current target version of this article is Joplin Desktop release v2.1.7 (Jun 2021).  
+I confirmed that the app could be built using my fork at the tag [freebsd-v2.1.7-electron10-20210630](https://github.com/genneko/joplin/releases/tag/freebsd-v2.1.7-electron10-20210630).
 ![Joplin Version](/images/howto-use-joplin-on-freebsd/JoplinVersion.png)
 
 ## Building Joplin
 I take the following steps to build Joplin desktop on my FreeBSD 12.2-RELEASE system (with XFCE4 desktop).
 
 1. Install dependencies such as Electron and Nodejs.  
-   As of 3 Feb 2021, all dependencies except electron9 can be installed from the FreeBSD's official packages.  
+   As of 30 Jun 2021, all dependencies except electron10+ can be installed from the FreeBSD's official packages.  
    ```
    sudo pkg install node12 npm-node12 python vips git rsync gnome-keyring gmake
    ```
@@ -27,19 +27,19 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.2-RELEASE sy
    > To use the latest software versions, you might want to switch the package repository from 'quarterly' to 'latest'.  
    > Please refer to the [relevant section](https://www.freebsd.org/doc/handbook/pkgng-intro.html#quarterly-latest-branch) of the FreeBSD Handbook for the steps.
 
-   For now, you have to install electron9 by building its port, or downloading a pre-official binary package from the following URL. (you can also get electron10 there!)  
+   For now, you have to install electron10+ by building its port, or downloading a pre-official binary package from the following URL.  
    https://github.com/tagattie/FreeBSD-Electron/releases
 
    Steps to build the port are something like:  
    ```
    sudo portsnap fetch update
-   cd /usr/ports/devel/electron9
+   cd /usr/ports/devel/electron12
    sudo make install
    ```
    Or install a pre-official package like:  
    ```
-   fetch https://github.com/tagattie/FreeBSD-Electron/releases/download/v9.4.1/electron9-9.4.1-freebsd12-amd64.txz
-   sudo pkg add electron9-9.4.1-freebsd12-amd64.txz
+   fetch https://github.com/tagattie/FreeBSD-Electron/releases/download/v10.4.7/electron10-10.4.7-freebsd12-amd64.txz
+   sudo pkg add electron10-10.4.7-freebsd12-amd64.txz
    ```
 
 2. Clone my forked version of Joplin and switch to electron_freebsd branch, which includes some modifications for FreeBSD.
@@ -51,9 +51,9 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.2-RELEASE sy
    ```
    > **NOTE**  
    > If the head of the branch cannot be built (it occurs from time to time), please try the tagged version which I confirmed to be built.  
-   > As of 3 Feb 2021, the latest confirmed tag is [freebsd-v1.7.10-electron9-20210202](https://github.com/genneko/joplin/releases/tag/freebsd-v1.7.10-electron9-20210202) and it can be checked out as follows:  
+   > As of 30 Jun 2021, the latest confirmed tag is [freebsd-v2.1.7-electron10-20210630](https://github.com/genneko/joplin/releases/tag/freebsd-v2.1.7-electron10-20210630) and it can be checked out as follows:  
    > ```
-   > git checkout freebsd-v1.7.10-electron9-20210202
+   > git checkout freebsd-v2.1.7-electron10-20210630
    > ```
 
 3. Make a small tweak to work around the [lzma-native build failure issue](https://github.com/addaleax/lzma-native/issues/98).  
@@ -74,7 +74,7 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.2-RELEASE sy
 
 4. Now you can run the desktop (Electron) app by running the following command  
    ```
-   electron9 .
+   electron10 .
    ```
    or by running a script included in my fork
    ```
@@ -197,3 +197,4 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 * 2020-09-12: Update the target version to 1.0.233. Also add a note on 1.1.x in the LSEP/CJK section.
 * 2020-12-03: Add notes on the recent versions.
 * 2021-02-03: Update the target version to 1.7.10.
+* 2021-06-30: Update the target version to 2.1.7.
