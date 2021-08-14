@@ -1,7 +1,7 @@
 ---
 title: "How to use Joplin desktop app on FreeBSD"
 date: 2020-01-15T20:26:00+09:00
-lastmod: 2021-06-30T10:41:00+09:00
+lastmod: 2021-08-14T11:28:00+09:00
 draft: false
 tags: [ "application", "installation", "freebsd", "font" ]
 toc: true
@@ -11,8 +11,8 @@ This is a quick note on how I build and use the latest Joplin desktop app on Fre
 For my initial exploration of Joplin on FreeBSD, please refer to the [previous post](/playing-with-bsd/application/joplin-on-freebsd).
 
 ## Target Version
-The current target version of this article is Joplin Desktop release v2.1.7 (Jun 2021).  
-I confirmed that the app could be built using my fork at the tag [freebsd-v2.1.7-electron10-20210630](https://github.com/genneko/joplin/releases/tag/freebsd-v2.1.7-electron10-20210630).
+The current target version of this article is Joplin Desktop release v2.2.7 (Aug 2021).  
+I confirmed that the app could be built using my fork at the tag [freebsd-v2.2.7](https://github.com/genneko/joplin/releases/tag/freebsd-v2.2.7).
 ![Joplin Version](/images/howto-use-joplin-on-freebsd/JoplinVersion.png)
 
 ## Building Joplin
@@ -51,9 +51,9 @@ I take the following steps to build Joplin desktop on my FreeBSD 12.2-RELEASE sy
    ```
    > **NOTE**  
    > If the head of the branch cannot be built (it occurs from time to time), please try the tagged version which I confirmed to be built.  
-   > As of 30 Jun 2021, the latest confirmed tag is [freebsd-v2.1.7-electron10-20210630](https://github.com/genneko/joplin/releases/tag/freebsd-v2.1.7-electron10-20210630) and it can be checked out as follows:  
+   > As of 14 Aug 2021, the latest confirmed tag is [freebsd-v2.2.7](https://github.com/genneko/joplin/releases/tag/freebsd-v2.2.7) and it can be checked out as follows:  
    > ```
-   > git checkout freebsd-v2.1.7-electron10-20210630
+   > git checkout freebsd-v2.2.7
    > ```
 
 3. Make a small tweak to work around the [lzma-native build failure issue](https://github.com/addaleax/lzma-native/issues/98).  
@@ -198,3 +198,4 @@ Fortunately, this issue can be worked around by using a [special font](/misc/NoL
 * 2020-12-03: Add notes on the recent versions.
 * 2021-02-03: Update the target version to 1.7.10.
 * 2021-06-30: Update the target version to 2.1.7.
+* 2021-08-14: Update the target version to 2.2.7.
